@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 1,
   },
   iconButton: {
     padding: 8,
@@ -43,7 +43,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginTop: 20,
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   avatar: {
     width: 80,
@@ -55,11 +55,12 @@ export const styles = StyleSheet.create({
   userInfo: {
     flex: 1,
     flexDirection: 'column',
+    marginTop: 8,
   },
   username: {
     fontSize: 20,
     fontWeight: '600',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   publicLink: {
     fontSize: 16,
@@ -68,7 +69,7 @@ export const styles = StyleSheet.create({
   },
   // Weather Section
   weatherSection: {
-    marginTop: 10,
+    marginTop: 16,
   },
   weatherScrollContainer: {
     paddingHorizontal: 16,
@@ -80,19 +81,57 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 10,
     width: 340,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
+  cardContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  iconsContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 12,
+    marginLeft: 16,
+   },
+   sunIcon: {
+    marginLeft: 8,
+   },
+   calendarContainer: {
+    alignSelf: 'center',
+    width: 60, 
+    height: 60, 
+    justifyContent: 'center',
+    alignItems: 'center',
+   },
+   calendarButton: {
+    backgroundColor: '#FFFFFF',
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    
+   },
   dayHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
   },
-  dayText: {
+  dayText1: {
     fontSize: 16,
     fontWeight: '500',
     color: '#000',
   },
+  dayText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#666',
+  },
   todayBadge: {
-    backgroundColor: '#FF5722',
+    backgroundColor: '#edaa9e',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 16,
@@ -104,7 +143,10 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
   },
   tempContainer: {
-    marginTop: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: -7,
+    gap: 8,
   },
   tempText: {
     fontSize: 20,
@@ -179,10 +221,10 @@ export const styles = StyleSheet.create({
   },
   statsAndSettings: {
     flexDirection: 'row',
-    justifyContent: 'space-between', // Aligne stats et bouton de manière équidistante
-    alignItems: 'center', // Centre verticalement stats et bouton
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
     marginTop: 1,
-    gap: 16, // Ajoute un espace entre statsSection et settingsButton
+    gap: 16, 
   },
   
   settingsButton: {

@@ -12,7 +12,7 @@ export interface HeaderModalProps {
     username: string;
     location?: string;
     weather?: WeatherInfo;
-    isLoading?: boolean;
+    //isLoading?: boolean;
     onToggleVariant: () => void;
     onCalendarPress?: () => void;
     onSettingsPress?: () => void;

@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { HeaderModal } from '../components/Profile/HeaderModal';
-import { WeatherInfo } from '../components/Profile/HeaderModal/types';  // Assurez-vous que le type WeatherInfo est importé correctement
-import { HeaderModalProps } from '../components/Profile/HeaderModal/types';
+import { WeatherInfo } from '../components/Profile/HeaderModal/types';  
 
 export const ProfileScreen: React.FC = () => {
   const [variant, setVariant] = useState<'private' | 'public'>('private');
 
-  // Définition des données météo
+ 
   const weatherData: WeatherInfo = {
     currentTemp: 20,
     minTemp: 11,
@@ -25,7 +24,7 @@ export const ProfileScreen: React.FC = () => {
     <View style={styles.container}>
       <HeaderModal
         variant={variant}
-        username="dinahs"
+        username="Dina Hsisou"
         location="Ouarzazat"
         weather={weatherData}
         onToggleVariant={handleToggleVariant}

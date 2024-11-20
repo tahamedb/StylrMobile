@@ -1,7 +1,6 @@
-// index.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
-import { BellIcon, BookmarkIcon, ChevronLeftIcon, MapPinIcon, CalendarIcon } from 'lucide-react-native';
+import { BellIcon, BookmarkIcon, ChevronLeftIcon, MapPinIcon, CalendarIcon,CalendarPlus,Sun } from 'lucide-react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { styles } from './styles';
 import { HeaderModalProps } from './types';
@@ -11,7 +10,7 @@ export const HeaderModal: React.FC<HeaderModalProps> = ({
   username,
   location,
   weather,
-  isLoading,
+  //isLoading,
   onToggleVariant,
   onCalendarPress,
   onSettingsPress,
@@ -27,9 +26,12 @@ export const HeaderModal: React.FC<HeaderModalProps> = ({
     minTemp: number, 
     isToday?: boolean
   ) => (
-    <View style={styles.weatherCard}>
+<View style={styles.weatherCard}>
+    <View>
       <View style={styles.dayHeader}>
-        <Text style={styles.dayText}>{day} {date}</Text>
+        <Text style={styles.dayText1}>{day} </Text>
+        <Text style={styles.dayText}>{date} </Text>
+
         {isToday && (
           <View style={styles.todayBadge}>
             <Text style={styles.todayText}>Aujourd'hui</Text>
@@ -38,9 +40,16 @@ export const HeaderModal: React.FC<HeaderModalProps> = ({
       </View>
       <View style={styles.tempContainer}>
         <Text style={styles.tempText}>{temp} / {minTemp}°C</Text>
+        <Sun size={30} color="#FFB800" />
       </View>
     </View>
-  );
+    <View style={styles.calendarContainer}>
+      <TouchableOpacity style={styles.calendarButton}>
+        <CalendarPlus size={35} color="black" strokeWidth={1.5} />
+      </TouchableOpacity>
+    </View>
+  </View>
+);
 
   return (
     <View style={styles.container}>
@@ -91,7 +100,7 @@ export const HeaderModal: React.FC<HeaderModalProps> = ({
       {/* User Info */}
       <View style={styles.userSection}>
         <Image 
-          source={require('@/assets/images/user.png')}
+          source={require('@/assets/images/avatar.png')}
           style={styles.avatar}
         />
         <View style={styles.userInfo}>
