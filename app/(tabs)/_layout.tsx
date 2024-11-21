@@ -57,6 +57,14 @@ export default function TabLayout() {
             />
     
           
+        <Tabs.Screen
+            name="homeScreen"
+            options={{
+                title: 'Home',
+                tabBarIcon: ({ color }) => <IconSymbol size={28} name="door.garage.closed" color={color} />,
+            }}
+        />
+
     </Tabs>
   );
 }
