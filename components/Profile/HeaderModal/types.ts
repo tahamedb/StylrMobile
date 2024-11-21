@@ -1,10 +1,13 @@
+export interface DailyWeather {
+  date: string;
+  dayName: string;
+  temp: number;
+  minTemp: number;
+}
 export interface WeatherInfo {
-    currentTemp: number;
-    minTemp: number;
-    date: string;
-    nextTemp?: number;
-    nextMinTemp?: number;
-    nextDate?: string;
+    currentDate: string;
+    forecast: DailyWeather[];
+  
   }
   
 export interface HeaderModalProps {
