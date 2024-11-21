@@ -9,15 +9,18 @@ import {usePosts} from "@/hooks/usePosts";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Test() {
-    const { posts, loading, error } = usePosts();
+    const { posts, loading, error, refetch } = usePosts();
 
     const [refreshing, setRefreshing] = useState(false);
 
-    const onRefresh = () => {
+    const onRefresh = async () => {
         setRefreshing(true);
-        setTimeout(() => {
+        try {
+            await refetch(); // Trigger data fetching from the API
+        } finally {
             setRefreshing(false);
-        }, 2000);
+        } {
+        }
     };
 
     if (loading) {
