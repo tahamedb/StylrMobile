@@ -7,6 +7,7 @@ import { HeaderModalProps } from './types';
 import { DailyWeather } from './types';
 
 
+
 export const HeaderModal: React.FC<HeaderModalProps> = ({
   variant,
   username,
@@ -23,15 +24,12 @@ export const HeaderModal: React.FC<HeaderModalProps> = ({
   const scrollViewRef = useRef<ScrollView>(null);
   
   useEffect(() => {
-    // Trouver l'index de "aujourd'hui"
     const todayIndex = weather?.forecast.findIndex(
       (day) => day.date === weather.currentDate
     ) || 0;
 
-    // Calculer la position de scroll (largeur de carte * index)
-    const scrollPosition = todayIndex * 340; // 320 est la largeur approximative d'une carte
-
-    // Scroll à la position calculée après le rendu
+    const scrollPosition = todayIndex * 340; 
+   
     setTimeout(() => {
       scrollViewRef.current?.scrollTo({
         x: scrollPosition,
