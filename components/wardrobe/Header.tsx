@@ -9,10 +9,11 @@ import { styles } from './Style/Header';
 
 type HeaderProps = {
   onOptionsPress: () => void;
+  onCheckPress?: () => void;
   onFilterPress?: () => void;
 };
 
-export function Header({ onOptionsPress, onFilterPress }: HeaderProps) {
+export function Header({ onOptionsPress, onCheckPress ,onFilterPress }: HeaderProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
@@ -20,19 +21,22 @@ export function Header({ onOptionsPress, onFilterPress }: HeaderProps) {
   return (
     <>
       <View style={styles.header}>
-        <IconSymbol 
-          name="chevron.left" 
-          size={24} 
-          color={isDark ? 'white' : 'black'} 
-          onPress={() => router.back()}
-        />
-        <ThemedText style={styles.title}>Tous les vêtements</ThemedText>
-        <View style={styles.headerRight}>
+        <Pressable onPress={() => router.back()}>
           <IconSymbol 
-            name="checkmark.square" 
+            name="chevron.left" 
             size={24} 
             color={isDark ? 'white' : 'black'} 
           />
+        </Pressable>
+        <ThemedText style={styles.title}>Tous les vêtements</ThemedText>
+        <View style={styles.headerRight}>
+          <Pressable onPress={onCheckPress}>
+            <IconSymbol 
+              name="checkmark.square" 
+              size={24} 
+              color={isDark ? 'white' : 'black'} 
+            />
+          </Pressable>
           <Pressable onPress={onOptionsPress}>
             <IconSymbol 
               name="ellipsis" 
@@ -40,7 +44,6 @@ export function Header({ onOptionsPress, onFilterPress }: HeaderProps) {
               color={isDark ? 'white' : 'black'} 
             />
           </Pressable>
-          
         </View>
       </View>
       <FilterButton onPress={onFilterPress} />

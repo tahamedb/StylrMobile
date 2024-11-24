@@ -19,7 +19,7 @@ export function FilterButton({
 
   return (
     <Pressable 
-      style={[styles.filterButton, isDark && styles.filterButtonDark]}
+      style={[styles.filterButton]}
       onPress={onPress}
     >
       <IconSymbol 

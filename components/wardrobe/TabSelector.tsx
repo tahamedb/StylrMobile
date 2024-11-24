@@ -16,7 +16,7 @@ export function TabSelector({ activeTab, onTabChange }: TabSelectorProps) {
   const isDark = colorScheme === 'dark';
 
   return (
-    <View style={[styles.tabContainer, isDark && styles.tabContainerDark]}>
+    <View style={[styles.tabContainer]}>
       <Pressable 
         style={[styles.tab, activeTab === 'tous' && styles.activeTab]}
         onPress={() => onTabChange('tous')}

@@ -7,13 +7,13 @@ import { styles } from './Style/ClothingCard';
 
 
 type ClothingCardProps = {
-  image: any;
+  imageUrl: any;
   brand: string;
   date: string;
-  onPress?: () => void;
+  //onPress?: () => void;
 };
 
-export function ClothingCard({image, brand, date, onPress }: ClothingCardProps) {
+export function ClothingCard({imageUrl, brand, date}: ClothingCardProps) {
 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -21,15 +21,16 @@ export function ClothingCard({image, brand, date, onPress }: ClothingCardProps) 
   return (
     <Pressable style={styles.clothingItem} onPress={() => router.push("/(tabs)/test")}>
       <View style={[styles.imageContainer, isDark && styles.imageContainerDark]}>
-        <Image
-          source={image}
-          style={styles.adaptiveImage}
-          resizeMode="cover"
-        />
+        <View style={styles.imageWrapper}>
+          <Image
+            source={imageUrl}
+            style={styles.adaptiveImage}
+            resizeMode="cover"
+          />
+        </View>
+        <ThemedText style={styles.brand}>{brand}</ThemedText>
+        <ThemedText style={styles.date}>{date}</ThemedText>
       </View>
-      <ThemedText style={styles.brand}>{brand}</ThemedText>
-      <ThemedText style={styles.date}>{date}</ThemedText>
     </Pressable>
   );
 }
-

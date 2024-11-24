@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View} from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { styles } from './Style/EmptyState';
 
@@ -8,7 +8,7 @@ type EmptyStateProps = {
   total?: number;
 };
 
-export function EmptyState({ count = 2, total = 5 }: EmptyStateProps) {
+export function EmptyState({ count = 0, total = 0 }: EmptyStateProps) {
   return (
     <View style={styles.emptyState}>
       <ThemedText style={styles.countText}>
