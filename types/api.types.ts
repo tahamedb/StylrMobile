@@ -30,3 +30,25 @@ export interface PostsResponse {
     skip: number;
     limit: number;
 }
+
+// Start Wordrobe part 
+
+export type Tab = 'tous' | 'tops';
+
+//!!ici ajouter champ brand  dans backend 
+
+export interface ClothingItem {
+    id: any;
+    name: string;
+    category: string;
+    color: string;
+    size: string;
+    material: string;
+    pattern: string;
+    season: string;
+    imageUrl: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+// End Wordrobe part 
