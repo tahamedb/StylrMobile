@@ -1,4 +1,3 @@
-// hooks/useWeather.ts
 import { useState, useEffect } from 'react';
 import { WeatherInfo } from '@/components/Profile/HeaderModal/types';
 
