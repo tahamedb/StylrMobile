@@ -4,16 +4,14 @@ import {apiClientWrapper} from "@/services/api/client";
 const Weather_Api_URL = process.env.EXPO_PUBLIC_OPEN_WEATHER_API_URL;
 const API_KEY = process.env.EXPO_PUBLIC_OPEN_WEATHER_API_KEY;
 export const fetchWeatherForecast = async (
-    lat: number,
-    lon: number
+     city: string,
 ): Promise<ForecastDay[]> => {
     if (!API_KEY) {
         throw new Error('API key is not set. Please configure your environment variables.');
     }
     try {
         const params = new URLSearchParams({
-            lat: lat.toString(),
-            lon: lon.toString(),
+            q:city,
             appid: API_KEY,
             units: 'metric', // Temperatures in Celsius
         }).toString();
