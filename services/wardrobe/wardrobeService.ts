@@ -1,5 +1,5 @@
 import { apiClientWrapper } from '@/services/api/client';
-import { ClothingItem} from '@/types/api.types';
+import { ClothingItem } from '@/types/api.types';
 
 //TODO:  Il doit etre dynamique selon Wordrobe de User Connecter(val statique 1: Juste pour tester endpoint.) 
 const WARDROBE_ID = 1;
