@@ -89,11 +89,10 @@ export default function ClothesDetailsScreen() {
           ref={scrollViewRef}
           style={styles.scrollView}
           enableOnAndroid={true}
-          enableAutomaticScroll={true}
+          extraScrollHeight={Platform.OS === 'ios' ? 50 : 0}
+          extraHeight={Platform.OS === 'ios' ? 50 : 0}
+          enableAutomaticScroll={false}
           keyboardShouldPersistTaps="handled"
-          extraScrollHeight={100}
-          extraHeight={120}
-          enableResetScrollToCoords={false}
         >
           {/* Image Section with error handling */}
           <View style={styles.imageContainer}>
