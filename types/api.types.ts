@@ -5,12 +5,13 @@ export interface ApiResponse<T> {
     status: number;
 }
 
-export interface User {
+// used By Taha
+/*export interface User {
     id: number;
     username: string;
     email: string;
 }
-
+*/
 export interface Post {
     id: number;
     title: string;
@@ -52,3 +53,35 @@ export interface ClothingItem {
 }
 
 // End Wordrobe part 
+// attributs non utilises mais existent dans backend (ajouter si besoin)
+export interface User {
+    id: number;
+    username: string;
+    //email: string;
+    //password: string;
+    profileImage: string;
+    bio: string;
+    //createdAt: string;
+    //updatedAt: string;
+    followers: User[];
+    followings: User[];
+  }
+
+
+export interface WeatherResponse {
+    list: Array<{
+        dt: number;
+        main: {
+            temp: number;
+            temp_min: number;
+            temp_max: number;
+        };
+        dt_txt: string;
+    }>;
+}
+
+export interface ForecastDay {
+    date: string;
+    temp_min: number;
+    temp_max: number;
+}
