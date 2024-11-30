@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = 'https://dummyjson.com'; // Replace with your actual base URL
+//const API_URL = 'https://dummyjson.com'; // Replace with your actual base URL
+const API_URL = 'https://25423c9b-63d3-4678-bbe0-35a51c99fb9a.mock.pstmn.io'; 
+
 
 export const apiClient = axios.create({
     baseURL: API_URL,
