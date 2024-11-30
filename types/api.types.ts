@@ -44,3 +44,22 @@ export interface User {
     followers: User[];
     followings: User[];
   }
+
+
+export interface WeatherResponse {
+    list: Array<{
+        dt: number;
+        main: {
+            temp: number;
+            temp_min: number;
+            temp_max: number;
+        };
+        dt_txt: string;
+    }>;
+}
+
+export interface ForecastDay {
+    date: string;
+    temp_min: number;
+    temp_max: number;
+}
