@@ -37,3 +37,40 @@ export const apiClientWrapper = {
     },
 
 };
+
+/*apiClient.interceptors.request.use(
+    (config: InternalAxiosRequestConfig) => {
+        console.log('🚀 Request URL:', `${config.baseURL}${config.url}`);
+        return config;
+    },
+    (error) => {
+        console.log('❌ Request Error:', error);
+        return Promise.reject(error);
+    }
+);
+
+apiClient.interceptors.response.use(
+    (response) => {
+        console.log('✅ Response Status:', response.status);
+        console.log('📦 Response Data:', response.data);
+        return response;
+    },
+    (error) => {
+        console.log('❌ Response Error:', error);
+        console.log('🔍 Full URL:', error.config?.url);
+        return Promise.reject(error);
+    }
+);
+
+export const apiClientWrapper = {
+    async get<T>(endpoint: string): Promise<T> {
+        try {
+            const response = await apiClient.get<T>(endpoint);
+            return response.data;
+        } catch (error) {
+            console.error(`Failed GET request to ${endpoint}:`, error);
+            throw error;
+        }
+    }
+};
+*/

@@ -7,9 +7,19 @@ const WARDROBE_ID = 1;
 export const wardrobeService = {
 
     getAllClothingItems: async () => {
-        const endpoint = `/wardrobes/${WARDROBE_ID}/clothing-items`;
-        return await apiClientWrapper.get<ClothingItem[]>(endpoint);
-    }
+        return await apiClientWrapper.get<ClothingItem[]>(`/wardrobes/${WARDROBE_ID}/clothing-items`);
+    },
+
+    //getClothingItemById: (clothingId: number) =>
+        //apiClientWrapper.get<ClothingItem>(`/api/wardrobes/${WARDROBE_ID}/clothing-items/${clothingId}`),
+
+    getClothingItemById: (clothingId: number) => {
+        console.log('Calling getClothingItemById with:', clothingId);
+        return apiClientWrapper.get<ClothingItem>(
+          `/wardrobes/${WARDROBE_ID}/clothing-items/${clothingId}`
+        );
+      },
 
     //TODO: Ajouter les autres Endpoints si necessaire selon Fonctionalité Ajouter dans app
+
 };
