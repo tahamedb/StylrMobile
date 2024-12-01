@@ -36,6 +36,8 @@ export interface PostsResponse {
 
 export type Tab = 'tous' | 'tops';
 
+
+
 //!!ici ajouter champ brand  dans backend 
 
 export interface ClothingItem {

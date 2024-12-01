@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet , SafeAreaView } from 'react-native';
 import { HeaderModal } from '@/components/Profile/HeaderModal';
 import { useWeather } from '@/hooks/profile/HeaderModal/useWeather';
 import useProfile from '@/hooks/profile/HeaderModal/useProfile';
 import { User } from '@/types/api.types';
-import { TabProvider } from '@/components/Profile/BodyModal/TabContext';
-import { PublicProfile } from '@/components/Profile/BodyModal/PublicProfile';
-import { PrivateProfile } from '@/components/Profile/BodyModal/PrivateProfile';
-import { BodyModal } from '@/components/Profile/BodyModal/BodyModal';
+import { BodyModal } from '@/components/Profile/BodyModal';
 
 export default function ProfileScreen() {
   const [variant, setVariant] = useState<'private' | 'public'>('private');
   const { weatherData } = useWeather();
-  const { user } = useProfile(1); 
+  const { user } = useProfile(1);
 
   const handleToggleVariant = () => {
     setVariant(prev => prev === 'private' ? 'public' : 'private');
@@ -25,10 +22,14 @@ export default function ProfileScreen() {
   };
 
   const userData = user || defaultUser;
+
  
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        
+      
       <HeaderModal
         variant={variant}
         user={userData as User}
@@ -39,16 +40,25 @@ export default function ProfileScreen() {
         onSettingsPress={() => console.log('Settings pressed')}
         onNotificationPress={() => console.log('Notification pressed')}
         onBookmarkPress={() => console.log('Bookmark pressed')}
-        followersCount={userData.followers?.length || 0} 
-        followingsCount={userData.followings?.length || 0} 
+        followersCount={userData.followers?.length || 0}
+        followingsCount={userData.followings?.length || 0}
       />
-    </View>
+     <BodyModal variant={variant} />
+     
+     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+  },
+  bodyContainer: {
+    flex: 1,
   },
 });

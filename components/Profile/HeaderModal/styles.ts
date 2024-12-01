@@ -3,8 +3,8 @@ import { StyleSheet, Platform } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    flex: 1,
-    paddingTop: Platform.OS === 'ios' ? 50 : 20,
+    flex: 0, 
+    paddingTop: 0, 
   },
   // TopBar Styles
   topBar: {
