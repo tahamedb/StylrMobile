@@ -49,27 +49,8 @@ export default function TabLayout() {
               }}
             />
 
-        <Tabs.Screen
-            name="homeScreen"
-            options={{
-                title: 'Home',
-                tabBarIcon: ({ color }) => <IconSymbol size={28} name="door.garage.closed" color={color} />,
-            }}
-        />
-        <Tabs.Screen
-            name="test"
-            options={{
-                title: 'Test',
-                tabBarIcon: ({ color }) => <IconSymbol size={28} name="face.smiling" color={color} />,
-            }}
-        />
-        <Tabs.Screen
-            name="settings"
-            options={{
-                title: 'Settings',
-                tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.2" color={color} />,
-            }}
-        />
+
+
       <Tabs.Screen
               name="test"
               options={{
@@ -77,8 +58,6 @@ export default function TabLayout() {
                 tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
               }}
             />
-
-
 
 
       <Tabs.Screen
@@ -103,6 +82,15 @@ export default function TabLayout() {
           ),
         }}
       />
+
+        <Tabs.Screen
+            name="settings"
+            options={{
+                title: 'Settings',
+                tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.2" color={color} />,
+            }}
+        />
     </Tabs>
+
   );
 }
