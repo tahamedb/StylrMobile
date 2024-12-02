@@ -86,60 +86,150 @@ export default function ClothesDetailsScreen() {
   ) => (
     <View style={styles.infoRow}>
       <ThemedText>{label}</ThemedText>
-      <TouchableOpacity
-        style={styles.dropdown}
-        onPress={() => {
-          setActiveField(field);
-          setDropdownVisible(true);
-        }}
-      >
-        <ThemedText style={styles.blueText}>
-          {clothingItem[field]}
-        </ThemedText>
-        <IconSymbol name="chevron.down" size={16} color={iconColor} />
-      </TouchableOpacity>
+      {field === 'colors' ? (
+        <View style={styles.dropdown}>
+          <View style={styles.colorContainer}>
+            <TouchableOpacity
+              style={[styles.colorCircle, styles.addColorCircle]}
+              onPress={() => {
+                setActiveField('colors');
+                setDropdownVisible(true);
+              }}
+            >
+              <IconSymbol 
+                name="plus" 
+                size={16} 
+                color="#666"
+                style={styles.plusIcon}
+              />
+            </TouchableOpacity>
+            <View style={styles.selectedColors}>
+              {clothingItem.colors.map((color) => (
+                <View
+                  key={color}
+                  style={[
+                    styles.colorCircle,
+                    { backgroundColor: color.toLowerCase() },
+                    color.toLowerCase() === 'white' && styles.whiteColorCircle
+                  ]}
+                />
+              ))}
+            </View>
+          </View>
+        </View>
+      ) : (
+        <TouchableOpacity
+          style={styles.dropdown}
+          onPress={() => {
+            setActiveField(field);
+            setDropdownVisible(true);
+          }}
+        >
+          <ThemedText style={styles.blueText}>
+            {clothingItem[field]}
+          </ThemedText>
+          <IconSymbol name="chevron.down" size={16} color={iconColor} />
+        </TouchableOpacity>
+      )}
     </View>
   );
 
-  const DropdownModal = ({ visible, onClose, options = [], onSelect, selectedValue }: DropdownModalProps) => (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <TouchableOpacity
-        style={styles.modalOverlay}
-        activeOpacity={1}
-        onPress={onClose}
+  const DropdownModal = ({ visible, onClose, options = [], onSelect, selectedValue }: DropdownModalProps) => {
+    const [tempColors, setTempColors] = useState<string[]>([]);
+    
+    useEffect(() => {
+      if (visible && activeField === 'colors') {
+        setTempColors([...clothingItem.colors]);
+      }
+    }, [visible]);
+
+    const handleColorToggle = (color: string) => {
+      setTempColors(prev => {
+        if (prev.includes(color)) {
+          return prev.filter(c => c !== color);
+        } else {
+          return [...prev, color];
+        }
+      });
+    };
+
+    const handleDone = () => {
+      if (activeField === 'colors') {
+        setClothingItem(prev => ({
+          ...prev,
+          colors: tempColors
+        }));
+      }
+      onClose();
+    };
+
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="slide"
+        onRequestClose={onClose}
       >
-        <View style={styles.modalContent}>
-          <ScrollView>
-            {Array.isArray(options) && options.map((option) => (
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={onClose}
+        >
+          <View style={styles.modalContent}>
+            <ScrollView>
+              {Array.isArray(options) && options.map((option) => (
+                <TouchableOpacity
+                  key={option}
+                  style={[
+                    styles.dropdownItem,
+                    selectedValue === option && styles.selectedDropdownItem
+                  ]}
+                  onPress={() => {
+                    if (activeField === 'colors') {
+                      handleColorToggle(option);
+                    } else {
+                      onSelect(option);
+                      onClose();
+                    }
+                  }}
+                >
+                  <View style={styles.dropdownItemContent}>
+                    {activeField === 'colors' && (
+                      <View
+                        style={[
+                          styles.colorPreview,
+                          { backgroundColor: option.toLowerCase() },
+                          option.toLowerCase() === 'white' && styles.whiteColorPreview
+                        ]}
+                      />
+                    )}
+                    <ThemedText style={
+                      tempColors.includes(option)
+                        ? styles.selectedDropdownText
+                        : styles.dropdownText
+                    }>
+                      {option}
+                    </ThemedText>
+                  </View>
+                  {tempColors.includes(option) && (
+                    <IconSymbol name="checkmark" size={20} color="#0a7ea4" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            {activeField === 'colors' && (
               <TouchableOpacity
-                key={option}
-                style={[
-                  styles.dropdownItem,
-                  selectedValue === option && styles.selectedDropdownItem
-                ]}
-                onPress={() => {
-                  onSelect(option);
-                  onClose();
-                }}
+                style={styles.doneButton}
+                onPress={handleDone}
               >
-                <ThemedText style={selectedValue === option ? styles.selectedDropdownText : styles.dropdownText}>
-                  {option}
-                </ThemedText>
-                {option === selectedValue && (
-                  <IconSymbol name="checkmark" size={20} color="#0a7ea4" />
-                )}
+                <ThemedText style={styles.doneButtonText}>Done</ThemedText>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  );
+            )}
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    );
+  };
 
   useEffect(() => {
     if (dropdownVisible && activeField) {
@@ -215,7 +305,6 @@ export default function ClothesDetailsScreen() {
 
           <View style={styles.actionButtons}>
             <TouchableOpacity style={styles.actionButton} >
-              {/*</TouchableOpacity> <TouchableOpacity style={styles.actionButton} onPress={handleImageUpload}> Test to upload image*/}
               <IconSymbol name="checkmark.circle" size={24} color={iconColor} />
               <ThemedText>Done</ThemedText>
             </TouchableOpacity>
@@ -294,39 +383,39 @@ export default function ClothesDetailsScreen() {
                 {renderDropdown('Neckline', 'neckline', CLOTHING_OPTIONS.neckline)}
                 {renderDropdown('Sleeve Length', 'sleeveLength', CLOTHING_OPTIONS.sleeveLength)}
 
-                <View style={styles.infoRow}>
+                <View style={styles.infoRow} >
                   <ThemedText>Colors</ThemedText>
-                  <View style={styles.colorSection}>
+                  <ScrollView horizontal={false}>
+                  <View style={styles.colorContainer}>
                     <View style={styles.colorCircles}>
-                      {clothingItem.colors && clothingItem.colors.length > 0 ? (
-                        clothingItem.colors.map((color) => (
-                          <TouchableOpacity
-                            key={color}
-                            style={[
-                              styles.colorCircle,
-                              { backgroundColor: color.toLowerCase() },
-                              color.toLowerCase() === 'white' && styles.whiteColorCircle
-                            ]}
-                            onPress={() => toggleArrayItem('colors', color)}
-                          />
-                        ))
-                      ) : (
-                        <ThemedText>No colors available</ThemedText>
-                      )}
+                      {clothingItem.colors.map((color) => (
+                        <TouchableOpacity
+                          key={color}
+                          style={[
+                            styles.colorCircle,
+                            { backgroundColor: color.toLowerCase() },
+                            color.toLowerCase() === 'white' && styles.whiteColorCircle
+                          ]}
+                          onPress={() => toggleArrayItem('colors', color)}
+                        />
+                      ))}
                     </View>
                     <TouchableOpacity
-                      style={[styles.colorCircle, styles.addColorCircle]}
+                      style={[styles.addColorCircle , styles.colorCircle]}
                       onPress={() => {
-                        const availableColors = CLOTHING_OPTIONS.colors
-                          .filter(c => !clothingItem.colors.includes(c));
-                        if (availableColors.length > 0) {
-                          toggleArrayItem('colors', availableColors[0]);
-                        }
+                        setActiveField('colors');
+                        setDropdownVisible(true);
                       }}
                     >
-                      <IconSymbol name="plus" size={16} color={iconColor} />
+                      <IconSymbol
+                        name="plus"
+                        size={16}
+                        color={iconColor}
+                        style={styles.plusIcon} // Add this style
+                      />
                     </TouchableOpacity>
-                  </View>
+                    </View>
+                  </ScrollView>
                 </View>
               </View>
             </>
@@ -454,22 +543,42 @@ const styles = StyleSheet.create({
   },
   colorSection: {
     flexDirection: 'column',
-    gap: 8,
+    gap: 12,
     alignItems: 'flex-end',
+    minWidth: 200,
   },
   colorCircles: {
+    flex: 1,
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    alignItems: 'center',
     justifyContent: 'flex-end',
-    maxWidth: 200,
+    gap: 4,
+  },
+  selectedColors: {
+    flexDirection: 'row',
+    flexWrap: 'wrap', // Ensures added colors wrap if the screen width is insufficient
+    alignItems: 'center',
   },
   colorCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 26,
+    height: 26,
+    borderRadius: 20,
+  },
+  addColorCircle: {
+    width: 26,
+    height: 26,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#ccc',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  whiteColorCircle: {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  plusIcon: {
+    opacity: 1,
   },
   outfitSection: {
     padding: 16,
@@ -500,16 +609,6 @@ const styles = StyleSheet.create({
   selectedTagText: {
     color: 'white',
   },
-  whiteColorCircle: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  addColorCircle: {
-    backgroundColor: '#f0f0f0',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderStyle: 'dashed',
-  },
   occasionTags: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -529,13 +628,20 @@ const styles = StyleSheet.create({
   dropdown: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 6,
     borderWidth: 1,
     borderColor: '#ccc',
-    gap: 8,
+    minWidth: 150,
+    height: 40,
+  },
+  colorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap', // Ensures colors wrap to a new line if needed
+    justifyContent: 'flex-start',
+    gap: 7, // Adds spacing between items (React Native >= 0.71)
   },
   modalOverlay: {
     flex: 1,
@@ -577,5 +683,41 @@ const styles = StyleSheet.create({
   },
   selectedDropdownItem: {
     backgroundColor: '#e0f7fa',
+  },
+  colorPickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginTop: 8,
+    minWidth: 150,
+  },
+  dropdownItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  colorPreview: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+  },
+  whiteColorPreview: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  doneButton: {
+    padding: 16,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  doneButtonText: {
+    color: '#0a7ea4',
+    fontWeight: '600',
   },
 });
