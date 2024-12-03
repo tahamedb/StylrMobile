@@ -1,5 +1,9 @@
-const CLOUDINARY_URL = ""
-const UPLOAD_PRESET = '';
+const CLOUDINARY_URL = process.env.EXPO_PUBLIC_CLOUDINARY_URL;
+const UPLOAD_PRESET = process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+
+if (!CLOUDINARY_URL || !UPLOAD_PRESET) {
+  throw new Error('Cloudinary configuration is missing. Please check your environment variables.');
+}
 
 export const uploadImageToCloudinary = async (imageBase64: string): Promise<string> => {
   try {
