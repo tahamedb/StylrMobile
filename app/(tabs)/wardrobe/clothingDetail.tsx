@@ -1,34 +1,7 @@
-/*import { SafeAreaView } from 'react-native';
-import { Stack, useLocalSearchParams } from 'expo-router';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { ClothingDetailView } from '@/components/wardrobe/clothingDetail/ClothingDetailView';
-
-export default function ClothingDetailScreen() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  const params = useLocalSearchParams();
-  const { imageUrl, brand, date } = params;
-
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#000' : '#fff' }}>
-      <Stack.Screen options={{ headerShown: false }} />
-      
-      <ClothingDetailView 
-        imageUrl={imageUrl as string}
-        brand={brand as string}
-        date={date as string}
-        isDark={isDark}
-      />
-
-    </SafeAreaView>
-  );
-}
-  */
-
 import { SafeAreaView, ActivityIndicator, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { ClothingDetailView } from '@/components/wardrobe/clothingDetail/ClothingDetailView';
+import { ClothingDetailView } from '@/components/wardrobe/clothingDetail/Body/ClothingDetailView';
 import { useClothingDetail } from '@/hooks/wardrobe/useClothingDetail';
 import { ThemedText } from '@/components/ThemedText';
 
@@ -36,18 +9,13 @@ export default function ClothingDetailScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const params = useLocalSearchParams();
-  //const { id } = params;
-
+ 
+  //parse the ID parameter
   const id = typeof params.id === 'string' ? parseInt(params.id, 10) : undefined;
   console.log('Parsed ID:', id);
 
+  //fetch the clothing detail from the API
   const { clothingDetail, loading, error } = useClothingDetail(id || 0);
-
-  //const {
-    //clothingDetail,
-    //loading,
-    //error
-  // } = useClothingDetail(Number(id));
 
   if (loading) {
     return (

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image, ScrollView } from 'react-native';
-import { InformationContent, TenueContent } from './DetailPageContenent';
+import { View, Image, ScrollView } from 'react-native';
+import { InformationContent } from './InformationComponents/InformationContent';
 import { TabSelectorDetailPage } from './TabSelectorDetailPage';
-import { HeaderDetailPage } from './HeaderDetailPage';
+import { HeaderDetailPage } from '../Header/HeaderDetailPage';
+import { styles } from '../Style/ClothingDetailView';
+import { TenueContent } from './TenueComponents/TenueContent';
 
 interface ClothingDetailViewProps {
   imageUrl: string;
@@ -39,18 +41,3 @@ export function ClothingDetailView({ imageUrl, brand, date, isDark }: ClothingDe
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  containerDark: {
-    backgroundColor: '#000',
-  },
-  image: {
-    width: '100%',
-    height: 400,
-    backgroundColor: '#f5f5f5',
-  },
-});

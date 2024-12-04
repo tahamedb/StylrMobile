@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { View, Pressable } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { styles } from '../Style/HeaderDetailPage';
 
 interface HeaderDetailPageProps {
   isDark: boolean;
@@ -37,20 +38,3 @@ export function HeaderDetailPage({ isDark }: HeaderDetailPageProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-});
