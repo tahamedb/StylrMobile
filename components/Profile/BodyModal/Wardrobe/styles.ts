@@ -5,6 +5,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 16,
+    
   },
   centerContainer: {
     flex: 1,
@@ -21,32 +22,36 @@ export const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     gap: 16,
+    
   },
   gridItem: {
     width: '47%',
     aspectRatio: 1,
     backgroundColor: '#F5F5F5',
-    borderRadius: 12,
-    overflow: 'hidden',
+    borderRadius: 22,
+    //overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#f6f2f0',
   },
   previewGrid: {
     width: '100%',
     height: '70%',
     flexDirection: 'row',
     flexWrap: 'wrap',
+    backgroundColor: '#fff',
   },
   smallPreviewImage: {
     width: '50%',
     height: '50%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   rightImage: {
     borderLeftWidth: 1,
-    borderLeftColor: '#fff',
+    borderLeftColor: '#f6f2f0',
   },
   bottomImage: {
     borderTopWidth: 1,
-    borderTopColor: '#fff',
+    borderTopColor: '#f6f2f0',
   },
   itemFooter: {
     padding: 8,
@@ -100,6 +105,19 @@ export const styles = StyleSheet.create({
   },
   comingSoonText: {
     fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+    marginBottom: 150,
+  },
+  emptyText: {
+    marginTop: 16,
+    fontSize: 16,
     color: '#666',
     textAlign: 'center',
   },

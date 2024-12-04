@@ -4,7 +4,7 @@ import { HeaderModal } from '@/components/Profile/HeaderModal';
 import { useWeather } from '@/hooks/profile/HeaderModal/useWeather';
 import useProfile from '@/hooks/profile/HeaderModal/useProfile';
 import { User } from '@/types/api.types';
-import { BodyModal } from '@/components/Profile/BodyModal';
+import { BodyModal } from '@/components/Profile/BodyModal/TabBar';
 
 export default function ProfileScreen() {
   const [variant, setVariant] = useState<'private' | 'public'>('private');
@@ -19,6 +19,8 @@ export default function ProfileScreen() {
     username: 'Anonymous',
     bio: 'No Bio',
     profileImage: require('@/assets/images/avatar.png'),
+    followers: [], 
+    followings: [], 
   };
 
   const userData = user || defaultUser;
@@ -43,7 +45,8 @@ export default function ProfileScreen() {
         followersCount={userData.followers?.length || 0}
         followingsCount={userData.followings?.length || 0}
       />
-     <BodyModal variant={variant} />
+     <BodyModal variant={variant}
+    />
      
      </View>
     </SafeAreaView>

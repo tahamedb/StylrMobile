@@ -1,20 +1,30 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-    tabBar: {
-      backgroundColor: '#ffffff',
-      elevation: 0,
-      shadowOpacity: 0,
-      borderBottomWidth: 1,
-      borderBottomColor: '#f0f0f0',
-      
-    },
-    indicator: {
-      backgroundColor: '#000000',
-      height: 2,
-    },
-    tabLabel: {
-      fontWeight: '600',
-      textTransform: 'none',
-    },
-  });
+  container: {
+    flex: 1,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5E5',
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#000',
+  },
+  tabText: {
+    color: '#666',
+  },
+  activeTabText: {
+    color: '#000',
+  },
+  content: {
+    flex: 1,
+  }
+});
