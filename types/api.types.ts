@@ -54,6 +54,8 @@ export interface ClothingItem {
     updatedAt: string;
 }
 
+
+
 // End Wordrobe part 
 // attributs non utilises mais existent dans backend (ajouter si besoin)
 export interface User {
