@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const dummyUsers = [
   { id: '1', name: 'John Doe', avatar: require('../assets/images/react-logo.png') },
@@ -13,10 +14,11 @@ const dummyUsers = [
 interface SearchBarWithListProps {
   searchQuery: string;
   setSearchQuery: Dispatch<SetStateAction<string>>;
-  navigation: any; 
 }
 
-export function SearchBarWithList({ searchQuery, setSearchQuery, navigation }: SearchBarWithListProps) {
+export function SearchBarWithList({ searchQuery, setSearchQuery }: SearchBarWithListProps) {
+  const router = useRouter();
+  
   // Filtrer les utilisateurs uniquement si une recherche est effectuée
   const filteredUsers = searchQuery.trim()
     ? dummyUsers.filter(
@@ -26,9 +28,12 @@ export function SearchBarWithList({ searchQuery, setSearchQuery, navigation }: S
       )
     : [];
 
+  const handleUserPress = (userId: string) => {
+    router.push(`/user/${userId}`);
+  };
+
   return (
     <View style={styles.container}>
-      {/* Barre de recherche */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -43,14 +48,13 @@ export function SearchBarWithList({ searchQuery, setSearchQuery, navigation }: S
         />
       </View>
 
-      {/* Liste filtrée des utilisateurs */}
       <FlatList
         data={filteredUsers}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.userContainer}
-            onPress={() => navigation.navigate('UserDetails', { userId: item.id })}
+            onPress={() => handleUserPress(item.id)}
           >
             <Image source={item.avatar} style={styles.avatar} />
             <Text style={styles.userName}>{item.name}</Text>
@@ -108,4 +112,3 @@ const styles = StyleSheet.create({
     color: '#888',
   },
 });
- 

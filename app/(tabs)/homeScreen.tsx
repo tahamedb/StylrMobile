@@ -54,7 +54,6 @@ export default function HomeScreen({ navigation }: any) { // Ajouter navigation 
             <SearchBarWithList 
               searchQuery={searchQuery} 
               setSearchQuery={setSearchQuery} 
-              navigation={navigation} // Passer la navigation au composant
             />
           }
         />
