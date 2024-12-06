@@ -25,7 +25,7 @@ const DUMMY_POSTS = [
   },
 ];
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }: any) { // Ajouter navigation ici
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -50,7 +50,13 @@ export default function HomeScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <Post key={item.id} {...item} />}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-          ListHeaderComponent={<SearchBarWithList searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
+          ListHeaderComponent={
+            <SearchBarWithList 
+              searchQuery={searchQuery} 
+              setSearchQuery={setSearchQuery} 
+              navigation={navigation} // Passer la navigation au composant
+            />
+          }
         />
       </ThemedView>
     </SafeAreaView>

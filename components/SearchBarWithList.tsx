@@ -1,22 +1,22 @@
 import React, { Dispatch, SetStateAction } from 'react';
-import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-// Dummy data (données fictives)
 const dummyUsers = [
-  { id: '1', name: 'John Doe' },
-  { id: '2', name: 'Jane Smith' },
-  { id: '3', name: 'Alice Johnson' },
-  { id: '4', name: 'Bob Brown' },
-  { id: '5', name: 'Charlie Green' },
+  { id: '1', name: 'John Doe', avatar: require('../assets/images/react-logo.png') },
+  { id: '2', name: 'Jane Smith', avatar: require('../assets/images/react-logo.png') },
+  { id: '3', name: 'Alice Johnson', avatar: require('../assets/images/react-logo.png') },
+  { id: '4', name: 'Bob Brown', avatar: require('../assets/images/react-logo.png') },
+  { id: '5', name: 'Charlie Green', avatar: require('../assets/images/react-logo.png') },
 ];
 
 // Définition des props du composant
 interface SearchBarWithListProps {
   searchQuery: string;
   setSearchQuery: Dispatch<SetStateAction<string>>;
+  navigation: any; 
 }
 
-export function SearchBarWithList({ searchQuery, setSearchQuery }: SearchBarWithListProps) {
+export function SearchBarWithList({ searchQuery, setSearchQuery, navigation }: SearchBarWithListProps) {
   // Filtrer les utilisateurs uniquement si une recherche est effectuée
   const filteredUsers = searchQuery.trim()
     ? dummyUsers.filter(
@@ -28,7 +28,7 @@ export function SearchBarWithList({ searchQuery, setSearchQuery }: SearchBarWith
 
   return (
     <View style={styles.container}>
-      {/* Search Bar */}
+      {/* Barre de recherche */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -43,14 +43,18 @@ export function SearchBarWithList({ searchQuery, setSearchQuery }: SearchBarWith
         />
       </View>
 
-      {/* Filtered User List */}
+      {/* Liste filtrée des utilisateurs */}
       <FlatList
         data={filteredUsers}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.userContainer}>
+          <TouchableOpacity
+            style={styles.userContainer}
+            onPress={() => navigation.navigate('UserDetails', { userId: item.id })}
+          >
+            <Image source={item.avatar} style={styles.avatar} />
             <Text style={styles.userName}>{item.name}</Text>
-          </View>
+          </TouchableOpacity>
         )}
         ListEmptyComponent={() =>
           searchQuery.trim() ? (
@@ -81,9 +85,17 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   userContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 12,
   },
   userName: {
     fontSize: 18,
@@ -96,3 +108,4 @@ const styles = StyleSheet.create({
     color: '#888',
   },
 });
+ 

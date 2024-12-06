@@ -1,24 +1,18 @@
+// useUsers.ts
 import { useState, useEffect } from 'react';
-import axios from 'axios';  // Si vous préférez utiliser axios, sinon vous pouvez utiliser fetch
-
-interface User {
-  id: string;
-  name: string;
-}
-
+import { fetchUsers,User } from '@/services/searchUsers/userServicesSearch';
 export function useUsers(searchQuery: string) {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const getUsers = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Remplacez l'URL par celle de votre API backend
-        const response = await axios.get('https://your-api-url.com/users');
-        setUsers(response.data); // Ou ajustez selon la structure de votre réponse
+        const data = await fetchUsers(); 
+        setUsers(data);
       } catch (err) {
         setError('Failed to fetch users');
       } finally {
@@ -26,8 +20,8 @@ export function useUsers(searchQuery: string) {
       }
     };
 
-    fetchUsers();
-  }, []);  // Exécuter au montage du composant
+    getUsers();
+  }, []); 
 
   // Filtrer les utilisateurs selon la recherche
   const filteredUsers = users.filter(user =>
