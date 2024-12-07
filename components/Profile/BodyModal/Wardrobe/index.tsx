@@ -13,7 +13,6 @@ export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
  const totalItems = wardrobeData?.length || 0;
  const previewItems = wardrobeData?.slice(0, 4) || [];
 
- // Filtrer les garde-robes publiques en mode public
  const filteredWardrobes = variant === 'public' 
    ? wardrobes.filter(wardrobe => wardrobe.isPublic)
    : wardrobes;

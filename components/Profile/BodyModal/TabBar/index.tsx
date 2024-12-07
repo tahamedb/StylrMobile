@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 import { Wardrobe } from '../Wardrobe';
 import { Outfits } from '../Outfits';
 import { useBodyModal } from '@/hooks/profile/BodyModal/useBodyModal';
@@ -37,7 +37,7 @@ export const BodyModal = ({ variant }: BodyModalProps) => {
       <View style={styles.content}>
         {selectedTab === 'wardrobe' ? 
           <Wardrobe variant={variant} /> : 
-          <Outfits />}
+          <Outfits variant={variant} />}
       </View>
     </View>
   );
