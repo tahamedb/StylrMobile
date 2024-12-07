@@ -13,15 +13,23 @@ export interface User {
 
 export interface Post {
     id: number;
-    title: string;
-    body: string;
-    tags: string[];
-    reactions: {
+    title?: string;
+    //body: string;
+    content:string;
+    tags?: string[];
+    reactions?: {
         likes: number;
         dislikes: number;
     };
-    views: number;
-    userId: number;
+    views?: number;
+    userId?: number;
+    createdAt?: string;
+    imageUrl?:string;
+}
+{/*creation d'interface juste pour la creation du post */}
+export interface PostCreation {
+    content: string;
+    imageUrl: string;
 }
 
 export interface PostsResponse {
