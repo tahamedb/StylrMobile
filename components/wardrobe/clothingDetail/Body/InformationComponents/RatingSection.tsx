@@ -6,7 +6,7 @@ import { styles } from '../../Style/RatingSection';
 
 export function RatingSection() {
   const [rating, setRating] = useState(0);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleRatingPress = (selectedRating: number) => {
     setRating(selectedRating);
@@ -29,7 +29,7 @@ export function RatingSection() {
           )}
           <IconSymbol
             name={isExpanded ? "chevron.up" : "chevron.right"}
-            size={20}
+            size={16}
             color="#000000"
           />
         </Pressable>

@@ -48,6 +48,7 @@ export function SeasonSection() {
         </Pressable>
       </View>
 
+      {/* Affichage des tags de saison */}
       {isExpanded && (
         <View style={styles.seasonTags}>
           {(['Printemps', 'Été', 'Automne', 'Hiver'] as Season[]).map((season) => (

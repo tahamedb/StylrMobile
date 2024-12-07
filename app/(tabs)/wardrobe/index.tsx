@@ -1,13 +1,10 @@
-//POUR pour contenue dynamique
-// Test 2 pout contenue dynamique
-
 import { StyleSheet, View, ScrollView, SafeAreaView, ActivityIndicator,Pressable } from 'react-native';
 import { Stack } from 'expo-router';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { Header } from '@/components/wardrobe/wardrobeHome/Header';
-import { TabSelector } from '@/components/wardrobe/wardrobeHome/TabSelector';
-import { ClothingCard } from '@/components/wardrobe/wardrobeHome/ClothingCard';
-import { EmptyState } from '@/components/wardrobe/wardrobeHome/EmptyState';
+import { Header } from '@/components/wardrobe/wardrobeHome/Header/Header';
+import { TabSelector } from '@/components/wardrobe/wardrobeHome/Body/TabSelector';
+import { ClothingCard } from '@/components/wardrobe/wardrobeHome/Body/ClothingCard';
+import { EmptyState } from '@/components/wardrobe/wardrobeHome/Body/EmptyState';
 import { useWardrobeContent } from '@/hooks/wardrobe/useWardrobeContent';
 import { ThemedText } from '@/components/ThemedText';
 
@@ -61,18 +58,20 @@ export default function WardrobeScreen() {
       <Header onOptionsPress={() => {/* votre code */}} />
       <TabSelector activeTab={activeTab} onTabChange={setActiveTab} />
       
+      {/* a rendre component aprés */}
+
       <View style={styles.debugInfo}>
         <ThemedText>Cette partie sera modifiée par la suite pour contenir les items sélectionnés.</ThemedText>
         <ThemedText></ThemedText>
         <ThemedText></ThemedText>
       </View>
-
+      
       <ScrollView style={styles.content}>
         <View style={styles.clothingGrid}>
         {clothingItems.map((item) => (
           <View key={item.id} style={styles.cardContainer}>
             <ClothingCard
-              id={item.id}  // Assurez-vous que ceci est passé
+              id={item.id}
               imageUrl={{ uri: item.imageUrl }}
               brand={item.name}
               date={new Date(item.createdAt).toLocaleDateString()}

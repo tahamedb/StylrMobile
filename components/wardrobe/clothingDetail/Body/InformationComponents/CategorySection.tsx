@@ -4,21 +4,11 @@ import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/CategorySection';
 
-type Category = 
-  | 'Tops'
-  | 'Robes'
-  | 'Pantalons'
-  | 'Jupes'
-  | 'Vêtements d\'extérieur'
-  | 'Chaussures'
-  | 'Sacs'
-  | 'Chapeaux'
-  | 'Bijoux'
-  | 'Autres Articles';
+type Category = | 'Tops'| 'Robes'| 'Pantalons'| 'Jupes'| 'Vêtements d\'extérieur'| 'Chaussures'| 'Sacs'| 'Chapeaux'| 'Bijoux'| 'Autres Articles';
 
 export function CategorySection() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const categories: Category[] = [
     'Tops', 'Robes', 'Pantalons', 'Jupes',
@@ -47,7 +37,7 @@ export function CategorySection() {
           )}
           <IconSymbol
             name={isExpanded ? "chevron.up" : "chevron.right"}
-            size={20}
+            size={ 16}
             color="#000000"
           />
         </Pressable>

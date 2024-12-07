@@ -3,7 +3,7 @@ import { Pressable, StyleSheet } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { ThemedText } from '@/components/ThemedText';
-import { styles } from './Style/FilterButton';
+import { styles } from '../Style/FilterButton';
 
 type FilterButtonProps = {
   onPress?: () => void;

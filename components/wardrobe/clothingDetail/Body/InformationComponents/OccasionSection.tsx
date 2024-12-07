@@ -20,7 +20,7 @@ type Occasion =
 
 export function OccasionSection() {
   const [selectedOccasion, setSelectedOccasion] = useState<Occasion | null>(null);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const occasions: Occasion[] = [
     'Quotidien', 'Travail', 'Rendez-Vous', 'Formel',

@@ -3,7 +3,7 @@ import { View, Pressable, Image } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { router } from "expo-router";
-import { styles } from './Style/ClothingCard';
+import { styles } from '../Style/ClothingCard';
 
 type ClothingCardProps = {
   id?: number; 
@@ -22,7 +22,6 @@ export function ClothingCard({id, imageUrl, brand, date}: ClothingCardProps) {
       pathname: "/(tabs)/wardrobe/clothingDetail",
       params: {
         id: id?.toString(),
-        //imageUrl: imageUrl.uri,
       }
     });
   };
