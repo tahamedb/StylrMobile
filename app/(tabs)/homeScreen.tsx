@@ -25,7 +25,7 @@ const DUMMY_POSTS = [
   },
 ];
 
-export default function HomeScreen({ navigation }: any) { // Ajouter navigation ici
+export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -36,17 +36,12 @@ export default function HomeScreen({ navigation }: any) { // Ajouter navigation 
     }, 2000);
   };
 
-  // Filtrer les posts en fonction de la recherche
-  const filteredPosts = DUMMY_POSTS.filter((post) =>
-    post.username.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <ThemedView style={styles.container}>
-        {/* Utilisez FlatList au lieu de ScrollView */}
+        {/* Utilisez FlatList */}
         <FlatList
-          data={filteredPosts}
+          data={DUMMY_POSTS} // Afficher tous les posts sans filtrage
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <Post key={item.id} {...item} />}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}

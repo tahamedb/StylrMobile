@@ -3,11 +3,11 @@ import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } 
 import { useRouter } from 'expo-router';
 
 const dummyUsers = [
-  { id: '1', name: 'John Doe', avatar: require('../assets/images/react-logo.png') },
-  { id: '2', name: 'Jane Smith', avatar: require('../assets/images/react-logo.png') },
-  { id: '3', name: 'Alice Johnson', avatar: require('../assets/images/react-logo.png') },
-  { id: '4', name: 'Bob Brown', avatar: require('../assets/images/react-logo.png') },
-  { id: '5', name: 'Charlie Green', avatar: require('../assets/images/react-logo.png') },
+  { id: '1', name: 'John Doe', profileImage: require('../assets/images/react-logo.png') },
+  { id: '2', name: 'Jane Smith', profileImage: require('../assets/images/react-logo.png') },
+  { id: '3', name: 'Alice Johnson', profileImage: require('../assets/images/react-logo.png') },
+  { id: '4', name: 'Bob Brown', profileImage: require('../assets/images/react-logo.png') },
+  { id: '5', name: 'Charlie Green', profileImage: require('../assets/images/react-logo.png') },
 ];
 
 // Définition des props du composant
@@ -56,7 +56,7 @@ export function SearchBarWithList({ searchQuery, setSearchQuery }: SearchBarWith
             style={styles.userContainer}
             onPress={() => handleUserPress(item.id)}
           >
-            <Image source={item.avatar} style={styles.avatar} />
+            <Image source={item.profileImage} style={styles.avatar} />
             <Text style={styles.userName}>{item.name}</Text>
           </TouchableOpacity>
         )}
