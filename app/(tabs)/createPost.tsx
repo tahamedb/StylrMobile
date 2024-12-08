@@ -127,3 +127,4 @@ export default function CreatePost() {
 }
 
 const styles = StyleSheet.create({});
+

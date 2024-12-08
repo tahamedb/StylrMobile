@@ -18,6 +18,11 @@ export interface Post {
     content:string;
     tags?: string[];
     reactions?: {
+    title?: string;
+    //body: string;
+    content:string;
+    tags?: string[];
+    reactions?: {
         likes: number;
         dislikes: number;
     };
@@ -26,7 +31,7 @@ export interface Post {
     createdAt?: string;
     imageUrl?:string;
 }
-{/*creation d'interface juste pour la creation du post */}
+}
 export interface PostCreation {
     content: string;
     imageUrl: string;
