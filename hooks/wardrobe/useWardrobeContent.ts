@@ -24,7 +24,7 @@ export function useWardrobeContent() {
   const displayedItems = useMemo(() => {
     if (activeTab === 'tops') {
       return clothingItems.filter(item => 
-        item.category?.toLowerCase() === 'top'
+        item.category?.toLowerCase() === 'tops'
       );
     }
     return clothingItems;

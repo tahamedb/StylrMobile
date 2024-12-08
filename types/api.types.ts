@@ -36,25 +36,34 @@ export interface PostsResponse {
 
 export type Tab = 'tous' | 'tops';
 
-//!!ici ajouter champ brand  dans backend 
+
+import { Occasion } from '../components/wardrobe/clothingDetail/Body/InformationComponents/OccasionSection';
 
 export interface ClothingItem {
+    occasion: Occasion | undefined;
     id: any;
     name: string;
     category: string;
     color: string;
     size: string;
     material: string;
-    pattern: string;
     season: string;
     imageUrl: string;
     createdAt: string;
     updatedAt: string;
+    brand: string;
+    rating: number;
+    price: number;
+    purchaseDate: string;
+    purchaseLink: string;
+    colors: string[];
 }
 
 
 
 // End Wordrobe part 
+
+
 // attributs non utilises mais existent dans backend (ajouter si besoin)
 export interface User {
     id: number;
