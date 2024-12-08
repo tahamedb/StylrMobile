@@ -2,27 +2,29 @@ import React, { useState } from 'react';
 import { View, Pressable } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import {styles} from '../../Style/SaisonSection';
+import { styles } from '../../Style/SaisonSection';
 
-type Season = 'Printemps' | 'Été' | 'Automne' | 'Hiver';
+export type Season = 'Printemps' | 'Été' | 'Automne' | 'Hiver';
 
-export function SeasonSection() {
-  const [selectedSeasons, setSelectedSeasons] = useState<Season[]>([]);
-  const [isExpanded, setIsExpanded] = useState(true);
+interface SeasonSectionProps {
+  initialSeason?: Season;
+  onSeasonChange?: (season: Season | null) => void;  
+}
 
-  const toggleSeason = (season: Season) => {
-    setSelectedSeasons(current => {
-      if (current.includes(season)) {
-        return current.filter(s => s !== season);
-      }
-      return [...current, season];
-    });
+export function SeasonSection({ 
+  initialSeason,
+  onSeasonChange 
+}: SeasonSectionProps) {
+  const [selectedSeason, setSelectedSeason] = useState<Season | null>(initialSeason || null);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleSeasonPress = (season: Season) => {
+    const newSeason = selectedSeason === season ? null : season;
+    setSelectedSeason(newSeason);
+    onSeasonChange?.(newSeason); 
   };
 
-  const getSelectedSeasonsText = () => {
-    if (selectedSeasons.length === 0) return '';
-    return selectedSeasons.join(', ');
-  };
+  const seasons: Season[] = ['Printemps', 'Été', 'Automne', 'Hiver'];
 
   return (
     <View style={styles.container}>
@@ -35,11 +37,11 @@ export function SeasonSection() {
           style={styles.selectionContainer}
           onPress={() => setIsExpanded(!isExpanded)}
         >
-          {selectedSeasons.length > 0 ? (
+          {selectedSeason && (
             <ThemedText style={styles.selectedText}>
-              {getSelectedSeasonsText()}
+              {selectedSeason}
             </ThemedText>
-          ) : null}
+          )}
           <IconSymbol
             name={isExpanded ? "chevron.up" : "chevron.right"}
             size={16}
@@ -48,21 +50,20 @@ export function SeasonSection() {
         </Pressable>
       </View>
 
-      {/* Affichage des tags de saison */}
       {isExpanded && (
         <View style={styles.seasonTags}>
-          {(['Printemps', 'Été', 'Automne', 'Hiver'] as Season[]).map((season) => (
+          {seasons.map((season) => (
             <Pressable
               key={season}
-              onPress={() => toggleSeason(season)}
+              onPress={() => handleSeasonPress(season)}
               style={[
                 styles.tag,
-                selectedSeasons.includes(season) && styles.tagSelected
+                selectedSeason === season && styles.tagSelected
               ]}
             >
               <ThemedText style={[
                 styles.tagText,
-                selectedSeasons.includes(season) && styles.tagTextSelected
+                selectedSeason === season && styles.tagTextSelected
               ]}>
                 {season}
               </ThemedText>

@@ -4,7 +4,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/OccasionSection';
 
-type Occasion = 
+export type Occasion = 
   | 'Quotidien'
   | 'Travail'
   | 'Rendez-Vous'
@@ -18,8 +18,12 @@ type Occasion =
   | 'Plage'
   | 'Et';
 
-export function OccasionSection() {
-  const [selectedOccasion, setSelectedOccasion] = useState<Occasion | null>(null);
+  interface OccasionSectionProps {
+    initialOccasion?: Occasion;
+  }
+  
+  export function OccasionSection({ initialOccasion }: OccasionSectionProps) {
+  const [selectedOccasion, setSelectedOccasion] = useState<Occasion | null>(initialOccasion || null);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const occasions: Occasion[] = [

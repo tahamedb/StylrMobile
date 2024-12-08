@@ -5,12 +5,16 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/MarqueSection';
 
 
-export function MarqueSection() {
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [brandName, setBrandName] = useState('');
+interface MarqueSectionProps {
+  initialBrand?: string;
+}
+
+export function MarqueSection({ initialBrand = '' }: MarqueSectionProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [brandName, setBrandName] = useState(initialBrand);
   
     const handleAddBrand = () => {
-      // Logique pour ajouter une marque
+      //TODO Logique pour ajouter une marque
     };
   
     return (

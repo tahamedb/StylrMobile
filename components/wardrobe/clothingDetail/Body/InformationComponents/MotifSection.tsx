@@ -4,77 +4,73 @@ import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/MotifSection';
 
-type Pattern = {
-  name: string;
-  icon: string;
-};
+export const MATERIALS = [
+  'Coton',
+  'Lin',
+  'Laine',
+  'Soie',
+  'Polyester',
+  'Nylon',
+  'Cuir',
+  'Daim',
+  'Denim',
+  'Velours',
+  'Satin',
+  'Jersey',
+  'Cachemire',
+  'Flanelle',
+  'Maille',
+  'Molleton',
+  'Tweed',
+  'Néoprène',
+  'Tulle',
+  'Dentelle',
+  'Mousseline',
+  'Viscose',
+  'Élasthanne',
+  'Autres Matériaux'
+] as const;
 
-const patterns: Pattern[] = [
-  { name: 'Uni', icon: 'solid' },
-  { name: 'Rayé', icon: 'striped' },
-  { name: 'Graphique', icon: 'graphic' },
-  { name: 'À Pois', icon: 'dots' },
-  { name: 'Animal', icon: 'animal' },
-  { name: 'Floral', icon: 'floral' },
-  { name: 'Tropical', icon: 'tropical' },
-  { name: 'Paisley', icon: 'paisley' },
-  { name: 'Argyle', icon: 'argyle' },
-  { name: 'Camouflage', icon: 'camo' },
-  { name: 'Bloc De Couleur', icon: 'colorblock' },
-  { name: 'Répété', icon: 'repeat' },
-  { name: 'Damier', icon: 'checker' },
-  { name: 'Plaid', icon: 'plaid' },
-  { name: 'Vichy', icon: 'gingham' },
-  { name: 'Pied-De-Poule', icon: 'houndstooth' },
-  { name: 'Herringbone', icon: 'herringbone' },
-  { name: 'Chevron', icon: 'chevron' },
-  { name: 'Tweed', icon: 'tweed' },
-  { name: 'Abstrait', icon: 'abstract' },
-  { name: 'Tie Dye', icon: 'tiedye' },
-  { name: 'Géométrique', icon: 'geometric' },
-  { name: 'Dentelle', icon: 'lace' },
-  { name: 'Autres Motifs', icon: 'more' }
-];
+export type Material = typeof MATERIALS[number];
 
-export function MotifSection() {
-  const [selectedPatterns, setSelectedPatterns] = useState<Pattern[]>([]);
+interface MaterialSectionProps {
+  initialMaterial?: Material;
+  onMaterialChange?: (material: Material | null) => void;
+}
+
+export function MotifSection({ 
+  initialMaterial, 
+  onMaterialChange 
+}: MaterialSectionProps) {
+  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(() => {
+    if (initialMaterial && MATERIALS.includes(initialMaterial)) {
+      return initialMaterial;
+    }
+    return null;
+  });
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const togglePattern = (pattern: Pattern) => {
-    setSelectedPatterns(current => {
-      const isSelected = current.some(p => p.name === pattern.name);
-      if (isSelected) {
-        return current.filter(p => p.name !== pattern.name);
-      }
-      return [...current, pattern];
-    });
+  const handleMaterialPress = (material: Material) => {
+    const newMaterial = selectedMaterial === material ? null : material;
+    setSelectedMaterial(newMaterial);
+    onMaterialChange?.(newMaterial);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.sectionHeader}>
         <View style={styles.labelContainer}>
-          <ThemedText style={styles.label}>Motif</ThemedText>
+          <ThemedText style={styles.label}>Matériau</ThemedText>
         </View>
         <Pressable 
           style={styles.selectionContainer}
           onPress={() => setIsExpanded(!isExpanded)}
         >
-          {selectedPatterns.length > 0 && (
+          {selectedMaterial && (
             <View style={styles.selectedPatternsContainer}>
-              {selectedPatterns.length <= 3 ? (
-                selectedPatterns.map((pattern, index) => (
-                  <View key={pattern.name} style={styles.selectedPatternItem}>
-                    <ThemedText style={styles.selectedText}>
-                      {pattern.name}{index < selectedPatterns.length - 1 ? ', ' : ''}
-                    </ThemedText>
-                  </View>
-                ))
-              ) : (
-                <ThemedText style={styles.selectedText}>
-                  {selectedPatterns.length} motifs sélectionnés
-                </ThemedText>
-              )}
+              <ThemedText style={styles.selectedText}>
+                {selectedMaterial}
+              </ThemedText>
             </View>
           )}
           <IconSymbol
@@ -87,27 +83,22 @@ export function MotifSection() {
 
       {isExpanded && (
         <View style={styles.patternGrid}>
-          {patterns.map((pattern) => (
+          {MATERIALS.map((material) => (
             <Pressable
-              key={pattern.name}
-              onPress={() => togglePattern(pattern)}
+              key={material}
+              onPress={() => handleMaterialPress(material)}
               style={[
                 styles.patternTag,
-                selectedPatterns.some(p => p.name === pattern.name) && styles.tagSelected
+                selectedMaterial === material && styles.tagSelected
               ]}
             >
-              {/*<IconSymbol
-                name={pattern.icon}
-                size={16}
-                color={selectedPatterns.some(p => p.name === pattern.name) ? '#FFFFFF' : '#000000'}
-              />*/}
               <ThemedText 
                 style={[
                   styles.tagText,
-                  selectedPatterns.some(p => p.name === pattern.name) && styles.tagTextSelected
+                  selectedMaterial === material && styles.tagTextSelected
                 ]}
               >
-                {pattern.name}
+                {material}
               </ThemedText>
             </Pressable>
           ))}

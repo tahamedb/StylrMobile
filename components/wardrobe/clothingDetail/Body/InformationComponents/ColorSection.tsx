@@ -45,9 +45,16 @@ const colors: Color[] = [
   { name: 'Argent', hex: '#C0C0C0' },
   { name: 'Coloré', hex: 'linear-gradient' }
 ];
+interface ColorSectionProps {
+  initialColors?: string[];
+}
 
-export function ColorSection() {
-  const [selectedColors, setSelectedColors] = useState<Color[]>([]);
+export function ColorSection({ initialColors = [] }: ColorSectionProps) {
+  const [selectedColors, setSelectedColors] = useState<Color[]>(
+    initialColors.map(colorName => 
+      colors.find(c => c.name === colorName) || colors[0]
+    )
+  );
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleColor = (color: Color) => {

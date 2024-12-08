@@ -4,17 +4,28 @@ import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/CategorySection';
 
-type Category = | 'Tops'| 'Robes'| 'Pantalons'| 'Jupes'| 'Vêtements d\'extérieur'| 'Chaussures'| 'Sacs'| 'Chapeaux'| 'Bijoux'| 'Autres Articles';
+export const CATEGORIES = [
+  'Tops', 
+  'Robes', 
+  'Pantalons', 
+  'Jupes',
+  'Vêtements d\'extérieur', 
+  'Chaussures', 
+  'Sacs',
+  'Chapeaux', 
+  'Bijoux', 
+  'Autres Articles'
+] as const;
 
-export function CategorySection() {
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+export type Category = typeof CATEGORIES[number];
+
+interface CategorySectionProps {
+  initialCategory?: Category;
+}
+
+export function CategorySection({ initialCategory }: CategorySectionProps) {
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(initialCategory || null);
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const categories: Category[] = [
-    'Tops', 'Robes', 'Pantalons', 'Jupes',
-    'Vêtements d\'extérieur', 'Chaussures', 'Sacs',
-    'Chapeaux', 'Bijoux', 'Autres Articles'
-  ];
 
   const handleCategoryPress = (category: Category) => {
     setSelectedCategory(category);
@@ -37,7 +48,7 @@ export function CategorySection() {
           )}
           <IconSymbol
             name={isExpanded ? "chevron.up" : "chevron.right"}
-            size={ 16}
+            size={16}
             color="#000000"
           />
         </Pressable>
@@ -45,7 +56,7 @@ export function CategorySection() {
 
       {isExpanded && (
         <View style={styles.categoryTags}>
-          {categories.map((category) => (
+          {CATEGORIES.map((category) => (
             <Pressable
               key={category}
               onPress={() => handleCategoryPress(category)}

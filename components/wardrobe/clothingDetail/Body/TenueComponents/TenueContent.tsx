@@ -1,14 +1,20 @@
 import React from 'react';
-import { View } from 'react-native';
-import { ThemedText } from '@/components/ThemedText';
+import { ScrollView, View } from 'react-native';
 import { styles } from '../../Style/TenueContent';
+import { OutfitIdeasSection } from './OutfitIdeasSection';
+import { DailyOutfitsSection } from './DailyOutfitsSection';
+import { TryOutfitSection } from './TryOutfitSection';
 
-export function TenueContent() {
+interface TenueContentProps {
+  clothingId: number;
+}
+
+export function TenueContent({ clothingId }: TenueContentProps) {
   return (
-    <View style={styles.container}>
-      <View style={styles.section}>
-        <ThemedText style={styles.sectionTitle}>Mes Tenues</ThemedText>
-      </View>
-    </View>
+    <ScrollView style={styles.container}>
+      <OutfitIdeasSection clothingId={clothingId} />
+      <DailyOutfitsSection clothingId={clothingId} />
+      <TryOutfitSection />
+    </ScrollView>
   );
 }

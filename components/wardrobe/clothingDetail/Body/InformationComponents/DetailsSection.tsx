@@ -28,7 +28,8 @@ export function DetailsSection() {
   
         {isExpanded && (
           <View style={styles.detailsContainer}>
-            {/* Contenu à venir */}
+            
+            {/* TODO:  Contenu de partie Detail */}
           </View>
         )}
       </View>

@@ -52,6 +52,7 @@ export default function ClothingDetailScreen() {
         brand={clothingDetail.name}
         date={clothingDetail.createdAt}
         isDark={isDark}
+        clothingDetail={clothingDetail}
       />
     
     </SafeAreaView>

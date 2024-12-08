@@ -4,8 +4,13 @@ import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/RatingSection';
 
-export function RatingSection() {
-  const [rating, setRating] = useState(0);
+interface RatingSectionProps {
+  initialRating?: number;
+}
+
+export function RatingSection({ initialRating = 0 }: RatingSectionProps) {
+  
+  const [rating, setRating] = useState(initialRating);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleRatingPress = (selectedRating: number) => {

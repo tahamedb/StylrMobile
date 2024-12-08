@@ -5,15 +5,17 @@ import { TabSelectorDetailPage } from './TabSelectorDetailPage';
 import { HeaderDetailPage } from '../Header/HeaderDetailPage';
 import { styles } from '../Style/ClothingDetailView';
 import { TenueContent } from './TenueComponents/TenueContent';
+import { ClothingItem } from '@/types/api.types';
 
 interface ClothingDetailViewProps {
   imageUrl: string;
   brand: string;
   date: string;
   isDark: boolean;
+ clothingDetail: ClothingItem;
 }
 
-export function ClothingDetailView({ imageUrl, brand, date, isDark }: ClothingDetailViewProps) {
+export function ClothingDetailView({ imageUrl, brand, date, isDark , clothingDetail}: ClothingDetailViewProps) {
   const [activeTab, setActiveTab] = useState<'information' | 'tenue'>('information');
 
   return (
@@ -33,9 +35,9 @@ export function ClothingDetailView({ imageUrl, brand, date, isDark }: ClothingDe
         />
 
         {activeTab === 'information' ? (
-          <InformationContent />
+          <InformationContent clothingDetail = {clothingDetail}/>
         ) : (
-          <TenueContent />
+          <TenueContent clothingId={1} />
         )}
       </ScrollView>
     </View>

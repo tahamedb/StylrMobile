@@ -4,12 +4,19 @@ import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/PurchaseSection';
 
-export function PurchaseSection() {
+interface PurchaseSectionProps {
+  initialSize?: string;
+  initialPrice?: number;
+  initialPurchaseDate?: string;
+  initialPurchaseLink?: string;
+}
+
+export function PurchaseSection({ initialSize,initialPrice,initialPurchaseDate,initialPurchaseLink}: PurchaseSectionProps) {
+  const [size, setSize] = useState(initialSize || '');
+  const [price, setPrice] = useState(initialPrice?.toString() || '');
+  const [purchaseDate, setPurchaseDate] = useState(initialPurchaseDate || '');
+  const [purchaseLink, setPurchaseLink] = useState(initialPurchaseLink || '');
   const [isExpanded, setIsExpanded] = useState(false);
-  const [size, setSize] = useState('');
-  const [price, setPrice] = useState('');
-  const [purchaseDate, setPurchaseDate] = useState('');
-  const [purchaseLink, setPurchaseLink] = useState('');
 
   const clearInput = (setter: React.Dispatch<React.SetStateAction<string>>) => {
     setter('');
