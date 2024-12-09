@@ -8,6 +8,7 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -40,14 +41,56 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
       />
+      <Tabs.Screen
+              name="wardrobe"
+              options={{
+                title: 'wardrobe',
+                tabBarIcon: ({ color }) => <IconSymbol size={28} name="tshirt.fill" color={color} />,
+              }}
+            />
+
+
+
+      <Tabs.Screen
+              name="test"
+              options={{
+                title: 'test',
+                tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+              }}
+            />
+
+
+      <Tabs.Screen
+        name="upload"
+        options={{
+          title: 'Upload',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol
+              size={32}
+              name="plus.circle.fill"
+              color={Colors[colorScheme ?? 'light'].tint}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="homeScreen"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="door.garage.closed" color={color} />
+          ),
+        }}
+      />
+
         <Tabs.Screen
-            name="homeScreen"
+            name="settings"
             options={{
-                title: 'Home',
-                tabBarIcon: ({ color }) => <IconSymbol size={28} name="door.garage.closed" color={color} />,
+                title: 'Settings',
+                tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.2" color={color} />,
             }}
         />
-
     </Tabs>
+
   );
 }
