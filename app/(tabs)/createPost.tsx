@@ -86,7 +86,7 @@ export default function CreatePost() {
       </View>
       <View style={className`flex-row justify-start items-center gap-3`}>
         <RNImage
-          source={require("@/assets/images/user.png")}
+          source={require("@/assets/images/defaultUser.png")}
           style={className`h-10 w-10 rounded-xl`}
         />
         <View>
@@ -127,4 +127,3 @@ export default function CreatePost() {
 }
 
 const styles = StyleSheet.create({});
-
