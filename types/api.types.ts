@@ -14,15 +14,28 @@ export interface ApiResponse<T> {
 */
 export interface Post {
     id: number;
-    title: string;
-    body: string;
-    tags: string[];
-    reactions: {
+    title?: string;
+    //body: string;
+    content:string;
+    tags?: string[];
+    reactions?: {
+    title?: string;
+    //body: string;
+    content:string;
+    tags?: string[];
+    reactions?: {
         likes: number;
         dislikes: number;
     };
-    views: number;
-    userId: number;
+    views?: number;
+    userId?: number;
+    createdAt?: string;
+    imageUrl?:string;
+}
+}
+export interface PostCreation {
+    content: string;
+    imageUrl: string;
 }
 
 export interface PostsResponse {
