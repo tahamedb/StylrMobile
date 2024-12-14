@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import { useFonts } from "expo-font";
 
+
 // Import your global CSS file (required for NativeWind)
 import "../global.css";
 
@@ -43,6 +44,12 @@ export default function RootLayout() {
             headerShown: true,
             title: "Garde-robe",
             headerBackVisible: true,
+          }}
+        />
+       <Stack.Screen 
+          name="localisation-search"
+          options={{ 
+            headerShown: false
           }}
         />
       </Stack>

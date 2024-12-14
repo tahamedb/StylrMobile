@@ -1,4 +1,5 @@
 import { User } from "@/types/api.types";
+import { LocationType } from "@/types/api.types";
 export interface DailyWeather {
   date: string;
   dayName: string;
@@ -40,10 +41,11 @@ export interface WeatherInfo {
   export interface HeaderModalProps {
     user: User;
     variant: 'private' | 'public';
-    location: string;
     weather?: WeatherInfo;
     followersCount: number;
     followingsCount: number;
+    location: string;
+    onLocationSelect: (location: LocationType) => void;
     onToggleVariant: () => void;
     onCalendarPress: () => void;
     onSettingsPress: () => void;

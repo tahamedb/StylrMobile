@@ -2,7 +2,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 //const API_URL = 'https://dummyjson.com'; // Replace with your actual base URL
 
-const API_URL = 'http://192.168.100.177:8088/api';  //URL dyali pour le test de Wardrobe localement.
+const API_URL = 'http://172.20.10.3:8088/api';  //URL dyali pour le test de Wardrobe localement.
 //const API_URL = 'https://25423c9b-63d3-4678-bbe0-35a51c99fb9a.mock.pstmn.io'; 
 
 

@@ -5,21 +5,35 @@ import { WeatherCard } from './WeatherCard';
 import { styles } from '../styles';
 import { WeatherSectionProps } from '../types';
 import { useWeatherScroll } from '@/hooks/profile/HeaderModal/useWeatherScroll';
+import { useRouter } from 'expo-router';
+
+
+
 
 export const WeatherSection: React.FC<WeatherSectionProps> = ({
   weather,
   location,
   onCalendarPress
 }) => {
+  //const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const scrollViewRef = useWeatherScroll(weather);
+  const router = useRouter();
+
 
   return (
     <View style={styles.weatherSection}>
-      <View style={styles.locationRow}>
-        <View style={styles.location}>
-          <MapPinIcon size={20} color="#666" />
-          <Text style={styles.locationText}>{location}</Text>
-        </View>
+      <View>
+      <TouchableOpacity 
+          style={styles.locationRow}
+          onPress={() => {
+            router.push('/localisation-search');
+          }}
+        >
+          <View style={styles.location}>
+            <MapPinIcon size={18} color="#666" />
+            <Text style={styles.locationText}>{location}</Text>
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity 
           style={styles.calendarLink}
           onPress={onCalendarPress}
@@ -27,7 +41,7 @@ export const WeatherSection: React.FC<WeatherSectionProps> = ({
         >
           <Text style={styles.calendarText}>Tenue du jour calendrier</Text>
           <ChevronLeftIcon 
-            size={20} 
+            size={16} 
             style={{ transform: [{ rotate: '180deg' }] }}
             color="#007AFF"
           />
