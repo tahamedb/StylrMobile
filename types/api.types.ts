@@ -14,15 +14,28 @@ export interface ApiResponse<T> {
 */
 export interface Post {
     id: number;
-    title: string;
-    body: string;
-    tags: string[];
-    reactions: {
+    title?: string;
+    //body: string;
+    content:string;
+    tags?: string[];
+    reactions?: {
+    title?: string;
+    //body: string;
+    content:string;
+    tags?: string[];
+    reactions?: {
         likes: number;
         dislikes: number;
     };
-    views: number;
-    userId: number;
+    views?: number;
+    userId?: number;
+    createdAt?: string;
+    imageUrl?:string;
+}
+}
+export interface PostCreation {
+    content: string;
+    imageUrl: string;
 }
 
 export interface PostsResponse {
@@ -38,6 +51,8 @@ export type Tab = 'tous' | 'tops';
 
 
 import { Occasion } from '../components/wardrobe/clothingDetail/Body/InformationComponents/OccasionSection';
+
+//!!ici ajouter champ brand  dans backend 
 
 export interface ClothingItem {
     occasion: Occasion | undefined;
@@ -58,8 +73,27 @@ export interface ClothingItem {
     purchaseLink: string;
     colors: string[];
 }
+//Profile wardrobe Component
+export interface Wardrobe {
+    id: string;
+    name: string;
+    itemCount: number;
+    items: ClothingItem[];
+    isPublic: boolean; 
+  }
+//Profile Outfits Component 
+export type TabType = 'Idées' | 'Tenue du jour' | 'Recommandation';
+export type VariantType = 'private' | 'public';
 
+export interface OutfitTabsProps {
+  activeTab: TabType;
+  setActiveTab: (tab: TabType) => void;
+  variant: VariantType;
+}
 
+export interface OutfitsProps {
+  variant: VariantType;
+}
 
 // End Wordrobe part 
 

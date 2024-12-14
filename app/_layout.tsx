@@ -1,4 +1,5 @@
 import { Slot } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SplashScreen } from "expo-router";
 import {DarkTheme, DefaultTheme, ThemeProvider} from "@react-navigation/native";
@@ -30,9 +31,29 @@ export default function RootLayout() {
   }
 
   return (
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme }>
-        <Slot />
-        <StatusBar style="auto" />
-      </ThemeProvider>
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <Stack>
+        <Stack.Screen 
+          name="(tabs)" 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="wardrobe"
+          options={{
+            headerShown: true,
+            title: "Garde-robe",
+            headerBackVisible: true,
+          }}
+        />
+          <Stack.Screen
+              name="clothingDetail"
+              options={{
+                  headerShown: false,
+                  presentation: 'modal'
+              }}
+          />
+      </Stack>
+      <StatusBar style="auto" />
+    </ThemeProvider>
   );
 }

@@ -19,7 +19,7 @@ export function ClothingCard({id, imageUrl, brand, date}: ClothingCardProps) {
   const handlePress = () => {
     console.log('Card pressed with ID:', id);
     router.push({
-      pathname: "/(tabs)/wardrobe/clothingDetail",
+      pathname: "/clothingDetail",
       params: {
         id: id?.toString(),
       }
