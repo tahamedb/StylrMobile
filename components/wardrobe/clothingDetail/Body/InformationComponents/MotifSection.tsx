@@ -3,7 +3,7 @@ import { View, Pressable } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/MotifSection';
-
+import { ClothingItem } from '@/types/api.types';
 export const MATERIALS = [
   'Coton',
   'Lin',
@@ -33,45 +33,35 @@ export const MATERIALS = [
 
 export type Material = typeof MATERIALS[number];
 
-interface MaterialSectionProps {
-  initialMaterial?: Material;
-  onMaterialChange?: (material: Material | null) => void;
+interface MotifSectionProps {
+  initialMaterial: Material;
+  onUpdate: (value: string) => void;
 }
 
-export function MotifSection({ 
-  initialMaterial, 
-  onMaterialChange 
-}: MaterialSectionProps) {
-  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(() => {
-    if (initialMaterial && MATERIALS.includes(initialMaterial)) {
-      return initialMaterial;
-    }
-    return null;
-  });
+export function MotifSection({ initialMaterial, onUpdate }: MotifSectionProps) {
+  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(initialMaterial || null);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleMaterialPress = (material: Material) => {
     const newMaterial = selectedMaterial === material ? null : material;
     setSelectedMaterial(newMaterial);
-    onMaterialChange?.(newMaterial);
+    onUpdate(newMaterial || '');
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.sectionHeader}>
         <View style={styles.labelContainer}>
-          <ThemedText style={styles.label}>Matériau</ThemedText>
+          <ThemedText style={styles.label}>Matériaux</ThemedText>
         </View>
         <Pressable 
           style={styles.selectionContainer}
           onPress={() => setIsExpanded(!isExpanded)}
         >
           {selectedMaterial && (
-            <View style={styles.selectedPatternsContainer}>
-              <ThemedText style={styles.selectedText}>
-                {selectedMaterial}
-              </ThemedText>
-            </View>
+            <ThemedText style={styles.selectedText}>
+              {selectedMaterial}
+            </ThemedText>
           )}
           <IconSymbol
             name={isExpanded ? "chevron.up" : "chevron.right"}

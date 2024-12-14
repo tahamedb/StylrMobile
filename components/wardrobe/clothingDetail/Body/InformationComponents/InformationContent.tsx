@@ -16,29 +16,54 @@ import { PurchaseSection } from './PurchaseSection';
 import { ClothingItem } from '@/types/api.types';
 
 interface InfosProps {
-  clothingDetail: ClothingItem;
+  clothingDetail: Partial<ClothingItem>;
+  isNewItem?: boolean;
+  onUpdate: (field: keyof ClothingItem, value: any) => void;
 }
 
-export function InformationContent({ clothingDetail }: InfosProps) {
+export function InformationContent({ clothingDetail, isNewItem, onUpdate }: InfosProps) {
   return (
     <View style={styles.container}>
       <View style={styles.section}>
         <ThemedText style={styles.sectionTitle}>Infos sur les TLO</ThemedText>
-        <SeasonSection initialSeason={clothingDetail.season as Season} />
-        <OccasionSection initialOccasion={clothingDetail.occasion} />
+        <SeasonSection 
+          initialSeason={clothingDetail.season as Season} 
+          onUpdate={(value) => onUpdate('season', value)}
+        />
+        <OccasionSection 
+          initialOccasion={clothingDetail.occasion}
+          onUpdate={(value) => onUpdate('occasion', value)}
+        />
       </View>
       <View style={styles.section}>
         <ThemedText style={styles.sectionTitle}>Infos sur l'article</ThemedText>
-        <RatingSection initialRating={clothingDetail.rating} />
-        <CategorySection initialCategory={clothingDetail.category as Category} />
-        <ColorSection initialColors={clothingDetail.colors} />
-        <MotifSection initialMaterial={clothingDetail.material as Material} />
-        <MarqueSection initialBrand={clothingDetail.brand} />
+        <RatingSection 
+          initialRating={clothingDetail.rating}
+          onUpdate={(value) => onUpdate('rating', value)}
+        />
+        <CategorySection 
+          initialCategory={clothingDetail.category || ''}
+          isNewItem={isNewItem}
+          onUpdate={(value) => onUpdate('category', value)}
+        />
+        <ColorSection 
+          initialColors={clothingDetail.colors || []}
+          onUpdate={(value) => onUpdate('colors', value)}
+        />
+        <MotifSection 
+          initialMaterial={clothingDetail.material as Material}
+          onUpdate={(value) => onUpdate('material', value)}
+        />
+        <MarqueSection 
+          initialBrand={clothingDetail.brand || ''}
+          onUpdate={(value) => onUpdate('brand', value)}
+        />
         <PurchaseSection 
           initialSize={clothingDetail.size}
           initialPrice={clothingDetail.price}
           initialPurchaseDate={clothingDetail.purchaseDate}
           initialPurchaseLink={clothingDetail.purchaseLink}
+          onUpdate={(field, value) => onUpdate(field, value)}
         />
       </View>
     </View>

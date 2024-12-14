@@ -3,18 +3,20 @@ import { View, Pressable } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/RatingSection';
-
+import { ClothingItem } from '@/types/api.types';
 interface RatingSectionProps {
   initialRating?: number;
+  onUpdate: (value: number) => void;
 }
 
-export function RatingSection({ initialRating = 0 }: RatingSectionProps) {
-  
+export function RatingSection({ initialRating = 0, onUpdate }: RatingSectionProps) {
   const [rating, setRating] = useState(initialRating);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleRatingPress = (selectedRating: number) => {
-    setRating(selectedRating);
+    const newRating = rating === selectedRating ? 0 : selectedRating;
+    setRating(newRating);
+    onUpdate(newRating);
   };
 
   const displayRating = rating > 0 ? `${rating} ★` : '';
@@ -51,7 +53,7 @@ export function RatingSection({ initialRating = 0 }: RatingSectionProps) {
                 <IconSymbol
                   name="star.fill"
                   size={32}
-                  color={star <= rating ? '#000000' : '#E0E0E0'}
+                  color={star <= rating ? '#FFD700' : '#E0E0E0'}
                 />
               </Pressable>
             ))}

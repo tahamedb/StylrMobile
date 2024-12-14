@@ -1,19 +1,23 @@
 const CLOUDINARY_URL = process.env.EXPO_PUBLIC_CLOUDINARY_URL;
 const UPLOAD_PRESET = process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
+//TODO:  Il doit etre dynamique selon User Connecter(val statique 1: Juste pour tester endpoint.) 
+const USER_ID = 1;
+
 if (!CLOUDINARY_URL || !UPLOAD_PRESET) {
   throw new Error('Cloudinary configuration is missing. Please check your environment variables.');
 }
 
 export const uploadImageToCloudinary = async (imageBase64: string): Promise<string> => {
   try {
+    console.log('Uploading image to Cloudinary:');
     const timestamp = new Date().getTime();
     
     const data = {
-      file: `data:image/jpeg;base64,${imageBase64}`,
+      file: `${imageBase64}`,
       upload_preset: UPLOAD_PRESET,
-      folder: "wewear_uploads",  // Add images to a folder
-      filename_override: `image_${timestamp}`  // Set a simple filename
+      folder: "wewear_uploads",
+      filename_override: `image_${timestamp}`
     };
 
     const response = await fetch(CLOUDINARY_URL, {

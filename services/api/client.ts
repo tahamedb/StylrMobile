@@ -1,11 +1,14 @@
 //import axios from 'axios';
+import { Platform } from 'react-native';
 import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import Constants from 'expo-constants/build/Constants';
 //const API_URL = 'https://dummyjson.com'; // Replace with your actual base URL
 
 
-const API_URL = 'http://localhost:8088/api';  //URL dyali pour le test de Wardrobe localement.
-
+const API_URL = Platform.select({
+    ios: 'http://localhost:8088/api', // Use localhost for iOS simulator
+    android: 'http://192.168.1.106:8088/api', // Use the local network IP for Android
+});
 
 
 
@@ -33,9 +36,9 @@ export const apiClientWrapper = {
         // Vérification du token avant chaque requête
         const token = Constants.expoConfig?.extra?.EXPO_PUBLIC_AUTH_TOKEN;
         
-        if (!token || token.trim() === '') {
-            throw new Error('Authentication token is missing');
-        }
+        //if (!token || token.trim() === '') {
+        //    throw new Error('Authentication token is missing');
+        //}
         
         try {
             const response = await apiClient.post<T>(endpoint, data);
@@ -57,7 +60,6 @@ export const apiClientWrapper = {
     },
 
 };
-
 /*apiClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         console.log('🚀 Request URL:', `${config.baseURL}${config.url}`);
@@ -92,5 +94,5 @@ export const apiClientWrapper = {
             throw error;
         }
     }
-};
-*/
+};*/
+
