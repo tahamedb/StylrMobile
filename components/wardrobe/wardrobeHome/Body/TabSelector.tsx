@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { styles } from './Style/TabSelector';
+import { styles } from '../Style/TabSelector';
 
 type Tab = 'tous' | 'tops';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View} from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { styles } from './Style/EmptyState';
+import { styles } from '../Style/EmptyState';
 
 type EmptyStateProps = {
   count?: number;

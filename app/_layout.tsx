@@ -52,6 +52,13 @@ export default function RootLayout() {
             headerShown: false
           }}
         />
+          <Stack.Screen
+              name="clothingDetail"
+              options={{
+                  headerShown: false,
+                  presentation: 'modal'
+              }}
+          />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
