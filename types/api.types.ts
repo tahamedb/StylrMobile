@@ -49,6 +49,8 @@ export interface PostsResponse {
 
 export type Tab = 'tous' | 'tops';
 
+
+
 //!!ici ajouter champ brand  dans backend 
 
 export interface ClothingItem {
@@ -64,8 +66,27 @@ export interface ClothingItem {
     createdAt: string;
     updatedAt: string;
 }
+//Profile wardrobe Component
+export interface Wardrobe {
+    id: string;
+    name: string;
+    itemCount: number;
+    items: ClothingItem[];
+    isPublic: boolean; 
+  }
+//Profile Outfits Component 
+export type TabType = 'Idées' | 'Tenue du jour' | 'Recommandation';
+export type VariantType = 'private' | 'public';
 
+export interface OutfitTabsProps {
+  activeTab: TabType;
+  setActiveTab: (tab: TabType) => void;
+  variant: VariantType;
+}
 
+export interface OutfitsProps {
+  variant: VariantType;
+}
 
 // End Wordrobe part 
 // attributs non utilises mais existent dans backend (ajouter si besoin)
