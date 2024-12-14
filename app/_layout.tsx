@@ -1,5 +1,4 @@
-import { Slot } from "expo-router";
-import { Stack } from "expo-router";
+import { Slot, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SplashScreen } from "expo-router";
 import {DarkTheme, DefaultTheme, ThemeProvider} from "@react-navigation/native";
@@ -45,13 +44,13 @@ export default function RootLayout() {
             headerBackVisible: true,
           }}
         />
-          <Stack.Screen
-              name="clothingDetail"
-              options={{
-                  headerShown: false,
-                  presentation: 'modal'
-              }}
-          />
+        <Stack.Screen
+          name="clothingDetail"
+          options={{
+            headerShown: false,
+            presentation: 'modal'
+          }}
+        />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

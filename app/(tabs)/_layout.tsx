@@ -54,7 +54,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="createPost"
         options={{
-          title: 'Feed',
+          title: 'Post',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons 
               name="grid" 
@@ -120,13 +120,7 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
-        name="index"
-        options={{
-          tabBarButton: () => null,
-        }}
-
-      />
+      
     </Tabs>
   );
 }
