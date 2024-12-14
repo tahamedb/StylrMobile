@@ -1,29 +1,26 @@
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-    tabContainer: {
+    tabBar: {
       flexDirection: 'row',
       borderBottomWidth: 1,
       borderBottomColor: '#e0e0e0',
     },
-    tabContainerDark: {
-      borderBottomColor: '#333',
-    },
     tab: {
+      flex: 1,
+      alignItems: 'center',
       paddingVertical: 12,
-      paddingHorizontal: 20,
     },
     activeTab: {
       borderBottomWidth: 2,
       borderBottomColor: '#000',
     },
     tabText: {
-      color: '#999',
-    },
-    tabTextDark: {
-      color: '#666',
+      fontSize: 16,
+      opacity: 0.7,
     },
     activeTabText: {
-      color: '#000',
-    },
+      opacity: 1,
+      fontWeight: '500',
+    }
   });

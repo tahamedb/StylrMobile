@@ -5,7 +5,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { ThemedText } from '@/components/ThemedText';
 import { useRouter } from 'expo-router';
 import { FilterButton } from './FilterButton';
-import { styles } from './Style/Header';
+import { styles } from '../Style/Header';
 
 type HeaderProps = {
   onOptionsPress: () => void;

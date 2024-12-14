@@ -1,25 +1,33 @@
 import React from 'react';
-import { View, Pressable, Image, StyleSheet } from 'react-native';
+import { View, Pressable, Image } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { router } from "expo-router";
-import { styles } from './Style/ClothingCard';
-
+import { styles } from '../Style/ClothingCard';
 
 type ClothingCardProps = {
+  id?: number; 
   imageUrl: any;
   brand: string;
   date: string;
-  //onPress?: () => void;
 };
 
-export function ClothingCard({imageUrl, brand, date}: ClothingCardProps) {
-
+export function ClothingCard({id, imageUrl, brand, date}: ClothingCardProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
+  const handlePress = () => {
+    console.log('Card pressed with ID:', id);
+    router.push({
+      pathname: "/clothingDetail",
+      params: {
+        id: id?.toString(),
+      }
+    });
+  };
+
   return (
-    <Pressable style={styles.clothingItem} onPress={() => router.push("/(tabs)/test")}>
+    <Pressable style={styles.clothingItem} onPress={handlePress}>
       <View style={[styles.imageContainer, isDark && styles.imageContainerDark]}>
         <View style={styles.imageWrapper}>
           <Image
