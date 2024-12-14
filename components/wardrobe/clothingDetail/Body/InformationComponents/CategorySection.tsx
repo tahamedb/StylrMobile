@@ -20,15 +20,19 @@ export const CATEGORIES = [
 export type Category = typeof CATEGORIES[number];
 
 interface CategorySectionProps {
-  initialCategory?: Category;
+  initialCategory: string;
+  isNewItem?: boolean;
+  onUpdate: (value: string) => void;
 }
 
-export function CategorySection({ initialCategory }: CategorySectionProps) {
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(initialCategory || null);
+export function CategorySection({ initialCategory, isNewItem, onUpdate }: CategorySectionProps) {
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleCategoryPress = (category: Category) => {
+  const handleCategoryPress = (category: string) => {
     setSelectedCategory(category);
+    setIsExpanded(false);
+    onUpdate(category);
   };
 
   return (

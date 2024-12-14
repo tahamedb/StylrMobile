@@ -36,9 +36,9 @@ export const apiClientWrapper = {
         // Vérification du token avant chaque requête
         const token = Constants.expoConfig?.extra?.EXPO_PUBLIC_AUTH_TOKEN;
         
-        if (!token || token.trim() === '') {
-            throw new Error('Authentication token is missing');
-        }
+        //if (!token || token.trim() === '') {
+        //    throw new Error('Authentication token is missing');
+        //}
         
         try {
             const response = await apiClient.post<T>(endpoint, data);
@@ -60,7 +60,6 @@ export const apiClientWrapper = {
     },
 
 };
-
 /*apiClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         console.log('🚀 Request URL:', `${config.baseURL}${config.url}`);
@@ -96,3 +95,4 @@ export const apiClientWrapper = {
         }
     }
 };*/
+

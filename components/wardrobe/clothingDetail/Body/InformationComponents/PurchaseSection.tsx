@@ -3,15 +3,23 @@ import { View, Pressable, TextInput } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/PurchaseSection';
+import { ClothingItem } from '@/types/api.types';
 
 interface PurchaseSectionProps {
   initialSize?: string;
   initialPrice?: number;
   initialPurchaseDate?: string;
   initialPurchaseLink?: string;
+  onUpdate: (field: keyof ClothingItem, value: any) => void;
 }
 
-export function PurchaseSection({ initialSize,initialPrice,initialPurchaseDate,initialPurchaseLink}: PurchaseSectionProps) {
+export function PurchaseSection({ 
+  initialSize,
+  initialPrice,
+  initialPurchaseDate,
+  initialPurchaseLink,
+  onUpdate
+}: PurchaseSectionProps) {
   const [size, setSize] = useState(initialSize || '');
   const [price, setPrice] = useState(initialPrice?.toString() || '');
   const [purchaseDate, setPurchaseDate] = useState(initialPurchaseDate || '');
@@ -20,6 +28,26 @@ export function PurchaseSection({ initialSize,initialPrice,initialPurchaseDate,i
 
   const clearInput = (setter: React.Dispatch<React.SetStateAction<string>>) => {
     setter('');
+  };
+
+  const handleSizeChange = (value: string) => {
+    setSize(value);
+    onUpdate('size', value);
+  };
+
+  const handlePriceChange = (value: string) => {
+    setPrice(value);
+    onUpdate('price', parseFloat(value) || 0);
+  };
+
+  const handlePurchaseDateChange = (value: string) => {
+    setPurchaseDate(value);
+    onUpdate('purchaseDate', value);
+  };
+
+  const handlePurchaseLinkChange = (value: string) => {
+    setPurchaseLink(value);
+    onUpdate('purchaseLink', value);
   };
 
   return (
@@ -52,7 +80,7 @@ export function PurchaseSection({ initialSize,initialPrice,initialPurchaseDate,i
               <TextInput
                 style={styles.input}
                 value={size}
-                onChangeText={setSize}
+                onChangeText={handleSizeChange}
                 placeholder="Entrer Taille"
                 placeholderTextColor="#A0A0A0"
               />
@@ -74,7 +102,7 @@ export function PurchaseSection({ initialSize,initialPrice,initialPurchaseDate,i
               <TextInput
                 style={styles.input}
                 value={price}
-                onChangeText={setPrice}
+                onChangeText={handlePriceChange}
                 placeholder="15$"
                 placeholderTextColor="#A0A0A0"
                 keyboardType="numeric"
@@ -97,7 +125,7 @@ export function PurchaseSection({ initialSize,initialPrice,initialPurchaseDate,i
               <TextInput
                 style={styles.input}
                 value={purchaseDate}
-                onChangeText={setPurchaseDate}
+                onChangeText={handlePurchaseDateChange}
                 placeholder="Entrez la date d'achat"
                 placeholderTextColor="#A0A0A0"
               />
@@ -119,7 +147,7 @@ export function PurchaseSection({ initialSize,initialPrice,initialPurchaseDate,i
               <TextInput
                 style={styles.input}
                 value={purchaseLink}
-                onChangeText={setPurchaseLink}
+                onChangeText={handlePurchaseLinkChange}
                 placeholder="Indiquez le lien d'achat"
                 placeholderTextColor="#A0A0A0"
               />
