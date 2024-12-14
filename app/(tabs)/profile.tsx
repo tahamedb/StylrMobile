@@ -25,30 +25,24 @@ export default function ProfileScreen() {
 
   const userData = user || defaultUser;
 
- 
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        
-      
-      <HeaderModal
-        variant={variant}
-        user={userData as User}
-        location="Ouarzazat"
-        weather={weatherData ?? undefined}
-        onToggleVariant={handleToggleVariant}
-        onCalendarPress={() => console.log('Calendar pressed')}
-        onSettingsPress={() => console.log('Settings pressed')}
-        onNotificationPress={() => console.log('Notification pressed')}
-        onBookmarkPress={() => console.log('Bookmark pressed')}
-        followersCount={userData.followers?.length || 0}
-        followingsCount={userData.followings?.length || 0}
-      />
-     <BodyModal variant={variant}
-    />
-     
-     </View>
+        <HeaderModal
+          variant={variant}
+          user={userData as User}
+          location="Ouarzazat"
+          weather={weatherData ?? undefined}
+          onToggleVariant={handleToggleVariant}
+          onCalendarPress={() => console.log('Calendar pressed')}
+          onSettingsPress={() => console.log('Settings pressed')}
+          onNotificationPress={() => console.log('Notification pressed')}
+          onBookmarkPress={() => console.log('Bookmark pressed')}
+          followersCount={userData.followers?.length || 0}
+          followingsCount={userData.followings?.length || 0}
+        />
+        <BodyModal variant={variant} />
+      </View>
     </SafeAreaView>
   );
 }

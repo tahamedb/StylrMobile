@@ -37,7 +37,7 @@ export default function UploadScreen() {
         
         setImage(imageUri);
         router.push({
-          pathname: '/clothes-details',
+          pathname: '/clothingDetail',
           params: { 
             imageBase64: base64
           }
