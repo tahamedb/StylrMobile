@@ -49,25 +49,55 @@ export interface PostsResponse {
 
 export type Tab = 'tous' | 'tops';
 
+
+import { Occasion } from '../components/wardrobe/clothingDetail/Body/InformationComponents/OccasionSection';
+
 //!!ici ajouter champ brand  dans backend 
 
 export interface ClothingItem {
+    occasion: Occasion | undefined;
     id: any;
     name: string;
     category: string;
     color: string;
     size: string;
     material: string;
-    pattern: string;
     season: string;
     imageUrl: string;
     createdAt: string;
     updatedAt: string;
+    brand: string;
+    rating: number;
+    price: number;
+    purchaseDate: string;
+    purchaseLink: string;
+    colors: string[];
+}
+//Profile wardrobe Component
+export interface Wardrobe {
+    id: string;
+    name: string;
+    itemCount: number;
+    items: ClothingItem[];
+    isPublic: boolean; 
+  }
+//Profile Outfits Component 
+export type TabType = 'Idées' | 'Tenue du jour' | 'Recommandation';
+export type VariantType = 'private' | 'public';
+
+export interface OutfitTabsProps {
+  activeTab: TabType;
+  setActiveTab: (tab: TabType) => void;
+  variant: VariantType;
 }
 
-
+export interface OutfitsProps {
+  variant: VariantType;
+}
 
 // End Wordrobe part 
+
+
 // attributs non utilises mais existent dans backend (ajouter si besoin)
 export interface User {
     id: number;

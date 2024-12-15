@@ -3,7 +3,7 @@ import { SafeAreaView, StyleSheet, TouchableOpacity, Image, View } from 'react-n
 import * as ImagePicker from 'expo-image-picker';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
@@ -14,7 +14,6 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 export default function UploadScreen() {
   const router = useRouter();
   const [image, setImage] = useState<string | null>(null);
-  const [detectedClothing, setDetectedClothing] = useState<string | null>(null);
   const colorScheme = useColorScheme();
   const iconColor = Colors[colorScheme ?? 'light'].icon;
   const [isLoading, setIsLoading] = useState(false);
@@ -36,10 +35,13 @@ export default function UploadScreen() {
         });
         
         setImage(imageUri);
+        
+        // Navigate to clothingDetail with the image data
         router.push({
-          pathname: '/clothes-details',
+          pathname: "/clothingDetail",
           params: { 
-            imageBase64: base64
+            imageBase64: base64,
+            isNewItem: "true" // Flag to indicate this is a new item being created
           }
         });
       } catch (error) {
@@ -60,7 +62,8 @@ export default function UploadScreen() {
 
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
+      allowsEditing: true,
+      aspect: [4, 3],
       quality: 1,
     });
 
@@ -70,16 +73,12 @@ export default function UploadScreen() {
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
+      allowsEditing: true,
+      aspect: [4, 3],
       quality: 1,
     });
 
     handleImageCapture(result);
-  };
-
-  const detectClothing = async (imageUri: string) => {
-    // Mock detection - replace with actual AI detection service
-    setDetectedClothing('Hoodie');
   };
 
   return (
@@ -87,36 +86,23 @@ export default function UploadScreen() {
       <ThemedView style={styles.container}>
         <ThemedText type="title" style={styles.title}>Add New Item</ThemedText>
         
-        {!image ? (
-          <ThemedView style={styles.uploadOptions}>
-            <TouchableOpacity 
-              style={styles.uploadButton} 
-              onPress={takePhoto}
-            >
-              <IconSymbol name="house.fill" size={32} color={iconColor} />
-              <ThemedText>Take Photo</ThemedText>
-            </TouchableOpacity>
+        <ThemedView style={styles.uploadOptions}>
+          <TouchableOpacity 
+            style={styles.uploadButton} 
+            onPress={takePhoto}
+          >
+            <MaterialCommunityIcons name="camera" size={32} color={iconColor} />
+            <ThemedText>Take Photo</ThemedText>
+          </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={styles.uploadButton} 
-              onPress={pickImage}
-            >
-              <IconSymbol name="paperplane.fill" size={32} color={iconColor} />
-              <ThemedText>Choose from Library</ThemedText>
-            </TouchableOpacity>
-          </ThemedView>
-        ) : (
-          <View style={styles.previewContainer}>
-            <Image source={{ uri: image }} style={styles.preview} />
-            {detectedClothing && (
-              <ThemedView style={styles.detectionResult}>
-                <ThemedText type="defaultSemiBold">
-                  Detected: {detectedClothing}
-                </ThemedText>
-              </ThemedView>
-            )}
-          </View>
-        )}
+          <TouchableOpacity 
+            style={styles.uploadButton} 
+            onPress={pickImage}
+          >
+            <MaterialCommunityIcons name="image" size={32} color={iconColor} />
+            <ThemedText>Choose from Library</ThemedText>
+          </TouchableOpacity>
+        </ThemedView>
       </ThemedView>
     </SafeAreaView>
   );
@@ -143,20 +129,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     gap: 12,
-  },
-  previewContainer: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 16,
-  },
-  preview: {
-    width: '100%',
-    height: 400,
-    borderRadius: 12,
-  },
-  detectionResult: {
-    padding: 16,
-    borderRadius: 8,
-    backgroundColor: '#f0f0f0',
   },
 }); 
