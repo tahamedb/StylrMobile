@@ -43,6 +43,7 @@
       "backgroundColor": "#ffffff"
     }
   ],
+   "expo-symbols",
   [
     "expo-location",
     {
@@ -50,8 +51,9 @@
     }
   ]
 ],
-    "experiments": {
+"experiments": {
       "typedRoutes": true
     }
+    
   }
 }

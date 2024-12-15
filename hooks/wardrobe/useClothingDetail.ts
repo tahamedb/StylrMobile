@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { wardrobeService } from '@/services/wardrobe/wardrobeService';
 import { ClothingItem } from '@/types/api.types';
 
-export function useClothingDetail(clothingId: number) {
+export function useClothingDetail(clothingId: number, shouldFetch: boolean = true) {
   const [clothingDetail, setClothingDetail] = useState<ClothingItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchClothingDetail = async () => {
+    if (!shouldFetch) return;
     
     try {
       setLoading(true);
@@ -22,10 +23,10 @@ export function useClothingDetail(clothingId: number) {
   };
 
   useEffect(() => {
-    if (clothingId) {
+    if (clothingId && shouldFetch) {
       fetchClothingDetail();
     }
-  }, [clothingId]);
+  }, [clothingId, shouldFetch]);
 
   return {
     clothingDetail,

@@ -1,5 +1,4 @@
-import { Slot } from "expo-router";
-import { Stack } from "expo-router";
+import { Slot, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SplashScreen } from "expo-router";
 import {DarkTheme, DefaultTheme, ThemeProvider} from "@react-navigation/native";

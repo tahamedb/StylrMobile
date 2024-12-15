@@ -8,12 +8,12 @@ export type Season = 'Printemps' | 'Été' | 'Automne' | 'Hiver';
 
 interface SeasonSectionProps {
   initialSeason?: Season;
-  onSeasonChange?: (season: Season | null) => void;  
+  onUpdate: (value: Season | null) => void;
 }
 
 export function SeasonSection({ 
   initialSeason,
-  onSeasonChange 
+  onUpdate 
 }: SeasonSectionProps) {
   const [selectedSeason, setSelectedSeason] = useState<Season | null>(initialSeason || null);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -21,7 +21,7 @@ export function SeasonSection({
   const handleSeasonPress = (season: Season) => {
     const newSeason = selectedSeason === season ? null : season;
     setSelectedSeason(newSeason);
-    onSeasonChange?.(newSeason); 
+    onUpdate(newSeason);
   };
 
   const seasons: Season[] = ['Printemps', 'Été', 'Automne', 'Hiver'];

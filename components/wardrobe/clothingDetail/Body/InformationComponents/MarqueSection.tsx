@@ -3,10 +3,11 @@ import { View, Pressable } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/MarqueSection';
-
+import { ClothingItem } from '@/types/api.types';
 
 interface MarqueSectionProps {
   initialBrand?: string;
+  onUpdate: (field: keyof ClothingItem, value: any) => void;
 }
 
 export function MarqueSection({ initialBrand = '' }: MarqueSectionProps) {

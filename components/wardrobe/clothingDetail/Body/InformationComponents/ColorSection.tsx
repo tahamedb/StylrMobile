@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Pressable } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -46,10 +46,11 @@ const colors: Color[] = [
   { name: 'Coloré', hex: 'linear-gradient' }
 ];
 interface ColorSectionProps {
-  initialColors?: string[];
+  initialColors: string[];
+  onUpdate: (value: string[]) => void;
 }
 
-export function ColorSection({ initialColors = [] }: ColorSectionProps) {
+export function ColorSection({ initialColors = [], onUpdate }: ColorSectionProps) {
   const [selectedColors, setSelectedColors] = useState<Color[]>(
     initialColors.map(colorName => 
       colors.find(c => c.name === colorName) || colors[0]
@@ -60,10 +61,12 @@ export function ColorSection({ initialColors = [] }: ColorSectionProps) {
   const toggleColor = (color: Color) => {
     setSelectedColors(current => {
       const isSelected = current.some(c => c.name === color.name);
-      if (isSelected) {
-        return current.filter(c => c.name !== color.name);
-      }
-      return [...current, color];
+      const newColors = isSelected 
+        ? current.filter(c => c.name !== color.name)
+        : [...current, color];
+      
+      onUpdate(newColors.map(c => c.name));
+      return newColors;
     });
   };
 

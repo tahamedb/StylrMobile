@@ -3,7 +3,7 @@ import { View, Pressable } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/OccasionSection';
-
+import { ClothingItem } from '@/types/api.types';
 export type Occasion = 
   | 'Quotidien'
   | 'Travail'
@@ -20,9 +20,10 @@ export type Occasion =
 
   interface OccasionSectionProps {
     initialOccasion?: Occasion;
+    onUpdate: (value: string) => void;
   }
   
-  export function OccasionSection({ initialOccasion }: OccasionSectionProps) {
+  export function OccasionSection({ initialOccasion, onUpdate }: OccasionSectionProps) {
   const [selectedOccasion, setSelectedOccasion] = useState<Occasion | null>(initialOccasion || null);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -33,7 +34,9 @@ export type Occasion =
   ];
 
   const handleOccasionPress = (occasion: Occasion) => {
-    setSelectedOccasion(occasion);
+    const newOccasion = selectedOccasion === occasion ? null : occasion;
+    setSelectedOccasion(newOccasion);
+    onUpdate(newOccasion || '');
   };
 
   return (
