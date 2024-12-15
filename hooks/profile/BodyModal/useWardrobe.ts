@@ -22,7 +22,7 @@ export const useWardrobe = () => {
         name: 'Test',
         itemCount: halfLength,
         items: items.slice(0, halfLength),
-        isPublic: false
+        isPublic: true
       },
       {
         id: '2',

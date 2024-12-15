@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
+import { View, TouchableOpacity, Text , ScrollView  } from 'react-native';
 import { Wardrobe } from '../Wardrobe';
 import { Outfits } from '../Outfits';
 import { useBodyModal } from '@/hooks/profile/BodyModal/useBodyModal';
@@ -33,12 +33,18 @@ export const BodyModal = ({ variant }: BodyModalProps) => {
           </TouchableOpacity>
         ))}
       </View>
+      <ScrollView 
+        style={styles.content}
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
 
       <View style={styles.content}>
         {selectedTab === 'wardrobe' ? 
           <Wardrobe variant={variant} /> : 
           <Outfits variant={variant} />}
       </View>
+      </ScrollView>
     </View>
   );
 };
