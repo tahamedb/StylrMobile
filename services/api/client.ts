@@ -1,4 +1,4 @@
-//import axios from 'axios';
+//import axios from 'axios'; 
 import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import Constants from 'expo-constants/build/Constants';
 //const API_URL = 'https://dummyjson.com'; // Replace with your actual base URL
@@ -12,6 +12,7 @@ export const apiClient = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${Constants.expoConfig?.extra?.EXPO_PUBLIC_AUTH_TOKEN}`
+       
     },
 });
 
@@ -34,7 +35,7 @@ export const apiClientWrapper = {
         if (!token || token.trim() === '') {
             throw new Error('Authentication token is missing');
         }
-        
+        console.log(token);
         try {
             const response = await apiClient.post<T>(endpoint, data);
             return response.data;
