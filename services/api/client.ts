@@ -7,7 +7,7 @@ import Constants from 'expo-constants/build/Constants';
 
 const API_URL = Platform.select({
     ios: 'http://localhost:8088/api', // Use localhost for iOS simulator
-    android: 'http://192.168.1.106:8088/api', // Use the local network IP for Android
+    android: 'http://192.168.1.6:8088/api', // Use the local network IP for Android
 });
 
 
@@ -17,6 +17,7 @@ export const apiClient = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${Constants.expoConfig?.extra?.EXPO_PUBLIC_AUTH_TOKEN}`
+       
     },
 });
 
@@ -36,10 +37,10 @@ export const apiClientWrapper = {
         // Vérification du token avant chaque requête
         const token = Constants.expoConfig?.extra?.EXPO_PUBLIC_AUTH_TOKEN;
         
-        //if (!token || token.trim() === '') {
-        //    throw new Error('Authentication token is missing');
-        //}
-        
+        if (!token || token.trim() === '') {
+            throw new Error('Authentication token is missing');
+        }
+        console.log(token);
         try {
             const response = await apiClient.post<T>(endpoint, data);
             return response.data;
