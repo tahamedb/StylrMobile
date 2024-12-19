@@ -6,7 +6,7 @@ import Constants from 'expo-constants/build/Constants';
 
 
 const API_URL = Platform.select({
-    ios: 'http://192.168.100.162:8088/api', // Use localhost for iOS simulator
+    ios: 'http://192.168.1.112:8088/api', // Use localhost for iOS simulator
     android: 'http://192.168.1.106:8088/api', // Use the local network IP for Android
 });
 

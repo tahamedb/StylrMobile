@@ -1,18 +1,30 @@
-import {StyleSheet, View, ScrollView, SafeAreaView, ActivityIndicator, Pressable, Image, Modal} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  SafeAreaView,
+  ActivityIndicator,
+  Pressable,
+  Image,
+  Modal,
+  Alert
+} from 'react-native';
 import { Stack } from 'expo-router';
 import { useColorScheme } from 'react-native';
+import { useState } from 'react';
 import { Header } from '@/components/wardrobe/wardrobeHome/Header/Header';
 import { TabSelector } from '@/components/wardrobe/wardrobeHome/Body/TabSelector';
 import { ClothingCard } from '@/components/wardrobe/wardrobeHome/Body/ClothingCard';
 import { EmptyState } from '@/components/wardrobe/wardrobeHome/Body/EmptyState';
 import { useWardrobeContent } from '@/hooks/wardrobe/useWardrobeContent';
+import { useCreateOutfit } from '@/hooks/wardrobe/Outfit/useCreateOutfit';
 import { ThemedText } from '@/components/ThemedText';
-import { useState } from 'react';
 
 export default function WardrobeScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const [showOutfitModal, setShowOutfitModal] = useState(false);
+  const { createOutfit, loading: creatingOutfit } = useCreateOutfit();
 
   const {
     clothingItems,
@@ -40,9 +52,33 @@ export default function WardrobeScreen() {
     // Action pour le bouton de filtre
   };
 
-  const handleCreateOutfit = () => {
-    console.log('Creating outfit with items:', selectedItems);
-    setShowOutfitModal(true);
+  const handleCreateOutfit = async () => {
+    if (selectedItems.length === 0) return;
+
+    try {
+      const outfitData = {
+        name: `Outfit du ${new Date().toLocaleDateString()}`,
+        description: `Outfit créé avec ${selectedItems.length} items`,
+        clothingItems: selectedItems
+      };
+
+      const newOutfit = await createOutfit(outfitData);
+
+      if (newOutfit) {
+        setShowOutfitModal(true);
+      } else {
+        Alert.alert(
+            "Erreur",
+            "Impossible de créer l'outfit. Veuillez réessayer."
+        );
+      }
+    } catch (error) {
+      console.error('Error in handleCreateOutfit:', error);
+      Alert.alert(
+          "Erreur",
+          "Une erreur est survenue lors de la création de l'outfit."
+      );
+    }
   };
 
   const handleCloseModal = () => {
@@ -110,12 +146,17 @@ export default function WardrobeScreen() {
                 </ThemedText>
               </View>
               <Pressable
-                  style={styles.createOutfitButton}
+                  style={[styles.createOutfitButton, creatingOutfit && styles.createOutfitButtonDisabled]}
                   onPress={handleCreateOutfit}
+                  disabled={creatingOutfit}
               >
-                <ThemedText style={styles.createOutfitButtonText}>
-                  Créer
-                </ThemedText>
+                {creatingOutfit ? (
+                    <ActivityIndicator color="white" size="small" />
+                ) : (
+                    <ThemedText style={styles.createOutfitButtonText}>
+                      Créer
+                    </ThemedText>
+                )}
               </Pressable>
             </View>
         )}
@@ -183,7 +224,6 @@ export default function WardrobeScreen() {
 }
 
 const styles = StyleSheet.create({
-  // ... styles existants ...
     container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -334,5 +374,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  createOutfitButtonDisabled: {
+    //backgroundColor: '#A9A9A9',
   },
 });
