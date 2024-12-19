@@ -6,6 +6,7 @@ export interface DailyWeather {
   temp: number;
   minTemp: number;
 }
+
 export interface WeatherInfo {
     currentDate: string;
     forecast: DailyWeather[];
@@ -31,6 +32,7 @@ export interface WeatherInfo {
     location: string;
     variant: 'private' | 'public';
     onCalendarPress: () => void;
+    onLocationSelect: (newLocation: LocationType) => Promise<void>;
   }
   export interface PublicProfileContentProps {
     user: User;

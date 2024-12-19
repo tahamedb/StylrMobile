@@ -13,11 +13,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { styles } from '@/components/Profile/HeaderModal/Localisation/styles';
 import * as Location from 'expo-location'; 
 import { LocationType } from '@/types/api.types';
-
-
+import { useLocationWeather } from '@/hooks/profile/HeaderModal/useLocationWeather';
 
 export default function LocalisationSearchScreen() {
   const router = useRouter();
+  const { updateLocation } = useLocationWeather();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<LocationType[]>([]);
   const [recentSearches, setRecentSearches] = useState<LocationType[]>([]);
@@ -68,6 +68,9 @@ export default function LocalisationSearchScreen() {
 
   const handleLocationSelect = async (location: LocationType) => {
     try {
+      console.log('Selecting new location:', location);
+
+      // Mise à jour des recherches récentes
       const newRecents = [
         location,
         ...recentSearches.filter(item => item.place_id !== location.place_id)
@@ -77,9 +80,14 @@ export default function LocalisationSearchScreen() {
       await AsyncStorage.setItem('recentLocations', JSON.stringify(newRecents));
       await AsyncStorage.setItem('selectedLocation', JSON.stringify(location));
       
+      // Mise à jour de la localisation et de la météo
+      await updateLocation(location);
+      console.log('Location and weather updated successfully');
+      
       router.back();
     } catch (error) {
-      console.error('Erreur sauvegarde location:', error);
+      console.error('Erreur lors de la mise à jour de la localisation:', error);
+      Alert.alert('Erreur', 'Impossible de mettre à jour la localisation');
     }
   };
 
@@ -102,7 +110,7 @@ export default function LocalisationSearchScreen() {
         }
       );
       const location = await response.json();
-      handleLocationSelect(location);
+      await handleLocationSelect(location);
     } catch (error) {
       console.error('Erreur géolocalisation:', error);
       Alert.alert('Erreur', 'Impossible d\'obtenir votre position');
@@ -111,9 +119,9 @@ export default function LocalisationSearchScreen() {
     }
   };
 
+  // ... reste du composant (retour JSX) inchangé ...
   return (
     <View style={styles.container}>
-      {/* Header avec bouton retour et barre de recherche */}
       <View style={styles.header}>
         <TouchableOpacity 
           onPress={() => router.back()}
@@ -134,7 +142,6 @@ export default function LocalisationSearchScreen() {
         </View>
       </View>
 
-      {/* Bouton localisation actuelle */}
       <TouchableOpacity 
         style={styles.currentLocationButton}
         onPress={getCurrentLocation}
@@ -145,12 +152,10 @@ export default function LocalisationSearchScreen() {
         <ArrowLeft size={20} color="#666666" style={{ transform: [{ rotate: '180deg' }] }} />
       </TouchableOpacity>
 
-      {/* Indicateur de chargement */}
       {isLoading && (
         <ActivityIndicator style={styles.loader} color="#666666" />
       )}
 
-      {/* Résultats de recherche */}
       {searchResults.length > 0 ? (
         searchResults.map((result) => (
           <TouchableOpacity 
@@ -165,7 +170,6 @@ export default function LocalisationSearchScreen() {
           </TouchableOpacity>
         ))
       ) : (
-        // Recherches récentes
         recentSearches.length > 0 && !searchTerm && (
           <View>
             <Text style={styles.recentTitle}>Recherches récentes</Text>
