@@ -84,6 +84,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    marginTop: 12,
   },
   cardContent: {
     flexDirection: 'row',
@@ -157,7 +158,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   location: {
     flexDirection: 'row',
@@ -165,7 +166,7 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   locationText: {
-    fontSize: 18,
+    fontSize: 15,
     color: '#666',
   },
   calendarLink: {
@@ -174,8 +175,10 @@ export const styles = StyleSheet.create({
     gap: 4,
   },
   calendarText: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#007AFF',
+    marginLeft: 19,
+    marginTop: 2,
   },
   // Public Profile Styles
   publicContent: {

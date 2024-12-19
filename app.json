@@ -15,29 +15,45 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#ffffff",
+        "infoPlist": {
+          "NSLocationWhenInUseUsageDescription": "Cette application a besoin d'accéder à votre localisation pour trouver votre ville.",
+          "NSLocationAlwaysUsageDescription": "Cette application a besoin d'accéder à votre localisation pour trouver votre ville."
+        }
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
+
     },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ],
-      "expo-symbols"
-    ],
-    "experiments": {
+"plugins": [
+  "expo-router",
+  [
+    "expo-splash-screen",
+    {
+      "image": "./assets/images/splash-icon.png",
+      "imageWidth": 200,
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    }
+  ],
+   "expo-symbols",
+  [
+    "expo-location",
+    {
+      "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+    }
+  ]
+],
+"experiments": {
       "typedRoutes": true
     }
+    
   }
 }
