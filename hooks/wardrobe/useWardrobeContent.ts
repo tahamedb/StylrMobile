@@ -9,6 +9,21 @@ export function useWardrobeContent() {
   const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error] = useState<Error | null>(null);
+  
+  //Ajout de état de selection :
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<ClothingItem[]>([]);
+
+  const toggleItemSelection = (item: ClothingItem) => {
+    setSelectedItems(prev => {
+      const isSelected = prev.some(i => i.id === item.id);
+      if (isSelected) {
+        return prev.filter(i => i.id !== item.id);
+      } else {
+        return [...prev, item];
+      }
+    });
+  };
 
   const fetchClothingItems = async () => {
     setLoading(true);
@@ -44,6 +59,13 @@ export function useWardrobeContent() {
     displayedCount: displayedItems.length,
     loading,
     error,
+    // ajouter pour la selection
+    isSelectionMode,
+    setIsSelectionMode,
+    selectedItems,
+    toggleItemSelection,
+
     refetch: fetchClothingItems
+
   };
 }
