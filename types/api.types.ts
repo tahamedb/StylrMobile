@@ -140,3 +140,15 @@ export interface ForecastDay {
     temp_min: number;
     temp_max: number;
 }
+
+//Location
+export interface LocationType  {
+    place_id: string;
+    display_name: string;
+    lat: string;
+    lon: string;
+  }
+  
+  export interface LocationSearchProps {
+    onLocationSelect: (location: Location) => void;
+  }

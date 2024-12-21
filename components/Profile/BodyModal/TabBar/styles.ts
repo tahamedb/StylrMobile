@@ -4,6 +4,9 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  scrollContainer: {
+    flexGrow: 1, // Permet au contenu de s'étendre si nécessaire
+  },
   tabBar: {
     flexDirection: 'row',
     borderBottomWidth: 1,

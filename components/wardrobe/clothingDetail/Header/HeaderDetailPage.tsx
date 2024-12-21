@@ -9,9 +9,18 @@ interface HeaderDetailPageProps {
   isNewItem?: boolean;
   onSave?: () => void;
   isSaving?: boolean;
+  removeBackground?: boolean;
+  onToggleBackground?: (value: boolean) => void;
 }
 
-export function HeaderDetailPage({ isDark, isNewItem, onSave, isSaving }: HeaderDetailPageProps) {
+export function HeaderDetailPage({ 
+  isDark, 
+  isNewItem, 
+  onSave, 
+  isSaving,
+  removeBackground = false,
+  onToggleBackground
+}: HeaderDetailPageProps) {
   return (
     <View style={styles.header}>
       <Pressable>
@@ -28,21 +37,33 @@ export function HeaderDetailPage({ isDark, isNewItem, onSave, isSaving }: Header
       
       <View style={styles.headerRight}>
         {isNewItem && (
-          <Pressable 
-            onPress={onSave}
-            disabled={isSaving}
-            style={styles.saveButton}
-          >
-            {isSaving ? (
-              <ActivityIndicator size="small" color={isDark ? 'white' : 'black'} />
-            ) : (
+          <>
+            <Pressable 
+              onPress={() => onToggleBackground?.(!removeBackground)}
+              style={[styles.iconButton, removeBackground && styles.iconButtonActive]}
+            >
               <MaterialCommunityIcons 
-                name="content-save"
+                name="image-off"
                 size={24}
-                color={isDark ? 'white' : 'black'}
+                color={removeBackground ? '#4CAF50' : (isDark ? 'white' : 'black')}
               />
-            )}
-          </Pressable>
+            </Pressable>
+            <Pressable 
+              onPress={onSave}
+              disabled={isSaving}
+              style={styles.saveButton}
+            >
+              {isSaving ? (
+                <ActivityIndicator size="small" color={isDark ? 'white' : 'black'} />
+              ) : (
+                <MaterialCommunityIcons 
+                  name="content-save"
+                  size={24}
+                  color={isDark ? 'white' : 'black'}
+                />
+              )}
+            </Pressable>
+          </>
         )}
         {!isNewItem && (
           <>
