@@ -7,10 +7,14 @@ import Constants from 'expo-constants/build/Constants';
 const API_URL = 'http://192.168.100.162:8088/api';  //URL dyali pour le test de Wardrobe localement.
 //const API_URL = 'https://25423c9b-63d3-4678-bbe0-35a51c99fb9a.mock.pstmn.io'; 
 
-{/*const API_URL = Platform.select({
+const API_URL = Platform.select({
+    ios: 'http://192.168.1.112:8088/api', // Use localhost for iOS simulator
+
+/*const API_URL = Platform.select({
     ios: 'http://localhost:8088/api', // Use localhost for iOS simulator
+
     android: 'http://192.168.1.106:8088/api', // Use the local network IP for Android
-});*/}
+});*/
 
 
 
