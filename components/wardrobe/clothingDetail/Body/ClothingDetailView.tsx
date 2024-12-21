@@ -45,6 +45,10 @@ export function ClothingDetailView({
     }
   };
 
+  const handleToggleBackground = (value: boolean) => {
+    updateField('removeBackground', value);
+  };
+
   return (
     <View style={[styles.container, isDark && styles.containerDark]}>
       <HeaderDetailPage 
@@ -52,6 +56,8 @@ export function ClothingDetailView({
         isNewItem={isNewItem}
         onSave={handleSave}
         isSaving={isSaving}
+        removeBackground={formData.removeBackground}
+        onToggleBackground={handleToggleBackground}
       />
       
       <ScrollView>
