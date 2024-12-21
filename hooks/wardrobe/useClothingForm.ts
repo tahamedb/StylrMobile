@@ -5,6 +5,7 @@ import { uploadImageToCloudinary } from '@/services/Cloudinary/CloudinaryService
 
 export interface ClothingFormData extends Partial<ClothingItem> {
     imageBase64?: string;
+    removeBackground?: boolean;
 }
 
 export function useClothingForm(initialData: Partial<ClothingItem>) {
@@ -22,12 +23,13 @@ export function useClothingForm(initialData: Partial<ClothingItem>) {
     purchaseDate: '',
     purchaseLink: '',
     colors: [],
+    removeBackground: false, // Default to false
     // Spread the initial data over the defaults
     ...initialData
   });
   const [isSaving, setIsSaving] = useState(false);
 
-  const updateField = (field: keyof ClothingItem, value: any) => {
+  const updateField = (field: keyof ClothingFormData, value: any) => {
     console.log(`Updating ${field} with:`, value);
     setFormData(prev => ({
       ...prev,
@@ -43,9 +45,15 @@ export function useClothingForm(initialData: Partial<ClothingItem>) {
       // If we have a base64 image, upload it first
       if (formData.imageUrl) {
         console.log('Uploading image to Cloudinary...');
-        const cloudinaryUrl = await uploadImageToCloudinary(formData.imageUrl);
+        const cloudinaryUrl = await uploadImageToCloudinary(
+          formData.imageUrl,
+          formData.removeBackground ? 'WeWear_nobg' : 'WeWear' // Use WeWear_nobg preset if removeBackground is true
+        );
         itemToSave.imageUrl = cloudinaryUrl;
       }
+
+      // Remove the removeBackground field before saving to backend
+      delete itemToSave.removeBackground;
 
       console.log('Saving clothing item with data:', itemToSave);
 

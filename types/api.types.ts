@@ -73,6 +73,16 @@ export interface ClothingItem {
     purchaseLink: string;
     colors: string[];
 }
+
+export interface Outfit {
+    id: number;
+    name: string;
+    description: string | null;
+    createdAt: string;
+    updatedAt: string;
+    clothingItems: ClothingItem[];
+}
+
 //Profile wardrobe Component
 export interface Wardrobe {
     id: string;
@@ -130,3 +140,15 @@ export interface ForecastDay {
     temp_min: number;
     temp_max: number;
 }
+
+//Location
+export interface LocationType  {
+    place_id: string;
+    display_name: string;
+    lat: string;
+    lon: string;
+  }
+  
+  export interface LocationSearchProps {
+    onLocationSelect: (location: Location) => void;
+  }

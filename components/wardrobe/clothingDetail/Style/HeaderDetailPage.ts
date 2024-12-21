@@ -27,4 +27,13 @@ export const styles = StyleSheet.create({
     saveButtonDisabled: {
       opacity: 0.5,
     },
+    iconButton: {
+      padding: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 8,
+    },
+    iconButtonActive: {
+      backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    },
   });

@@ -6,7 +6,9 @@ export const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 16,
     
+    
   },
+  
   centerContainer: {
     flex: 1,
     justifyContent: 'center',

@@ -21,7 +21,9 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({
         )}
       </View>
       <View style={styles.tempContainer}>
-        <Text style={styles.tempText}>{dayWeather.temp} / {dayWeather.minTemp}°C</Text>
+        <Text style={styles.tempText}>
+          {Math.round(dayWeather.temp)} / {Math.round(dayWeather.minTemp)}°C
+        </Text>
         <Sun size={30} color="#FFB800" />
       </View>
     </View>

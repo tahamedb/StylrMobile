@@ -8,14 +8,14 @@ if (!CLOUDINARY_URL || !UPLOAD_PRESET) {
   throw new Error('Cloudinary configuration is missing. Please check your environment variables.');
 }
 
-export const uploadImageToCloudinary = async (imageBase64: string): Promise<string> => {
+export const uploadImageToCloudinary = async (imageBase64: string, preset?: string): Promise<string> => {
   try {
     console.log('Uploading image to Cloudinary:');
     const timestamp = new Date().getTime();
     
     const data = {
       file: `${imageBase64}`,
-      upload_preset: UPLOAD_PRESET,
+      upload_preset: preset || UPLOAD_PRESET,
       folder: "wewear_uploads",
       filename_override: `image_${timestamp}`
     };

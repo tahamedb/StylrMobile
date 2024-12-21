@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import { useFonts } from "expo-font";
 
+
 // Import your global CSS file (required for NativeWind)
 import "../global.css";
 
@@ -44,13 +45,19 @@ export default function RootLayout() {
             headerBackVisible: true,
           }}
         />
-        <Stack.Screen
-          name="clothingDetail"
-          options={{
-            headerShown: false,
-            presentation: 'modal'
+       <Stack.Screen 
+          name="localisation-search"
+          options={{ 
+            headerShown: false
           }}
         />
+          <Stack.Screen
+              name="clothingDetail"
+              options={{
+                  headerShown: false,
+                  presentation: 'modal'
+              }}
+          />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
