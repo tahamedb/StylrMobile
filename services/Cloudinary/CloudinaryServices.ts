@@ -1,8 +1,6 @@
 const CLOUDINARY_URL = process.env.EXPO_PUBLIC_CLOUDINARY_URL;
 const UPLOAD_PRESET = process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-//TODO:  Il doit etre dynamique selon User Connecter(val statique 1: Juste pour tester endpoint.) 
-const USER_ID = 1;
 
 if (!CLOUDINARY_URL || !UPLOAD_PRESET) {
   throw new Error('Cloudinary configuration is missing. Please check your environment variables.');

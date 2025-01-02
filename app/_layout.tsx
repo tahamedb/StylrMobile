@@ -1,16 +1,53 @@
-import { Slot, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SplashScreen } from "expo-router";
 import {DarkTheme, DefaultTheme, ThemeProvider} from "@react-navigation/native";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import { useFonts } from "expo-font";
+import { UserProvider } from '@/contexts/UserContext';
+import { useProtectedRoute } from './_auth';
 
 // Import your global CSS file (required for NativeWind)
 import "../global.css";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
+
+function RootLayoutNav() {
+  useProtectedRoute();
+
+  return (
+    <Stack>
+      <Stack.Screen 
+        name="(tabs)" 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="wardrobe"
+        options={{ 
+          headerShown: true,
+          title: "Garde-robe",
+          headerBackVisible: true,
+        }} 
+      />
+      <Stack.Screen 
+        name="clothingDetail"
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }} 
+      />
+      <Stack.Screen 
+        name="auth" 
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }} 
+      />
+    </Stack>
+  );
+}
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -31,28 +68,10 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen 
-          name="(tabs)" 
-          options={{ headerShown: false }} 
-        />
-        <Stack.Screen 
-          name="wardrobe"
-          options={{
-            headerShown: true,
-            title: "Garde-robe",
-            headerBackVisible: true,
-          }}
-        />
-        <Stack.Screen
-          name="clothingDetail"
-          options={{
-            headerShown: false,
-            presentation: 'modal'
-          }}
-        />
-      </Stack>
-      <StatusBar style="auto" />
+      <UserProvider>
+        <RootLayoutNav />
+        <StatusBar style="auto" />
+      </UserProvider>
     </ThemeProvider>
   );
 }

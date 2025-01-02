@@ -51,7 +51,7 @@ export function ClothingDetailView({
       const predictions = await Promise.race<PredictionResponse>([
         predictClothingAttributes(currentImage),
         new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('API timeout')), 10000)
+          setTimeout(() => reject(new Error('API timeout')), 20000)
         )
       ]);
       

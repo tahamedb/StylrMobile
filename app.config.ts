@@ -5,5 +5,8 @@ export default {
       EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET: process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
       EXPO_PUBLIC_AUTH_TOKEN: process.env.EXPO_PUBLIC_AUTH_TOKEN, 
     },
+    plugins: [
+      "expo-secure-store"
+    ],
   },
 }; 

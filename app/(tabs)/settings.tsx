@@ -1,9 +1,14 @@
 import React from 'react';
 import {View, Text, Switch, Button, StyleSheet, SafeAreaView} from 'react-native';
 import { useColorScheme } from 'react-native';
+import { useRouter } from 'expo-router';
+import { authService } from '@/services/auth/authService';
+import { useUser } from '@/contexts/UserContext';
 
 const SettingsScreen = () => {
     const colorScheme = useColorScheme();
+    const router = useRouter();
+    const { setUser } = useUser();
 
     const toggleTheme = () => {
         // Implement theme toggle logic
@@ -15,50 +20,58 @@ const SettingsScreen = () => {
         console.log('Change language');
     };
 
-    const handleLogout = () => {
-        // Implement logout logic
-        console.log('Logout');
+    const handleLogout = async () => {
+        try {
+            await authService.logout();
+            setUser(null);
+            router.replace('/auth');
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
     };
+
     const viewTOS = () => {
-        // Implement logout logic
+        // Implement TOS view logic
         console.log('TOS');
     };
+
     const changeCredentials = () => {
-        // Implement logout logic
+        // Implement credentials change logic
         console.log('change credentials');
     };
 
-
     return (
         <SafeAreaView style={styles.container}>
-        <View style={styles.container}>
-            <Text style={styles.header}>Settings</Text>
+            <View style={styles.container}>
+                <Text style={styles.header}>Settings</Text>
 
-            <View style={styles.settingItem}>
-                <Text style={styles.settingText}>Dark Mode</Text>
-                <Switch
-                    value={colorScheme === 'dark'}
-                    onValueChange={toggleTheme}
-                />
-            </View>
+                <View style={styles.settingItem}>
+                    <Text style={styles.settingText}>Dark Mode</Text>
+                    <Switch
+                        value={colorScheme === 'dark'}
+                        onValueChange={toggleTheme}
+                    />
+                </View>
 
-            <View style={styles.settingItem}>
-                <Text style={styles.settingText}>Language</Text>
-                <Button title="Change Language" onPress={changeLanguage} />
-            </View>
-            <View style={styles.settingItem}>
-                <Text style={styles.settingText}>Credentials</Text>
-                <Button title="Change Credentials" onPress={changeCredentials} />
-            </View>
+                <View style={styles.settingItem}>
+                    <Text style={styles.settingText}>Language</Text>
+                    <Button title="Change Language" onPress={changeLanguage} />
+                </View>
 
-            <View style={styles.settingItem}>
-                <Text style={styles.settingText}>Terms of Service</Text>
-                <Button title="View Terms of Service" onPress={viewTOS} />
+                <View style={styles.settingItem}>
+                    <Text style={styles.settingText}>Credentials</Text>
+                    <Button title="Change Credentials" onPress={changeCredentials} />
+                </View>
+
+                <View style={styles.settingItem}>
+                    <Text style={styles.settingText}>Terms of Service</Text>
+                    <Button title="View Terms of Service" onPress={viewTOS} />
+                </View>
+
+                <View style={styles.logoutButton}>
+                    <Button title="Logout" onPress={handleLogout} color="#FF3B30" />
+                </View>
             </View>
-            <View  style={styles.logoutButton}>
-                <Button title="Logout" onPress={handleLogout} color="#FF3B30" />
-            </View>
-        </View>
         </SafeAreaView>
     );
 };
