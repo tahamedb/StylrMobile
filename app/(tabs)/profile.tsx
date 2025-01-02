@@ -1,36 +1,72 @@
-import React, { useState } from 'react';
-import { View, StyleSheet , SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
 import { HeaderModal } from '@/components/Profile/HeaderModal';
 import { useWeather } from '@/hooks/profile/HeaderModal/useWeather';
-import useProfile from '@/hooks/profile/HeaderModal/useProfile';
 import { User } from '@/types/api.types';
 import { BodyModal } from '@/components/Profile/BodyModal/TabBar';
+import { userService } from '@/services/user/userService';
+import { ThemedText } from '@/components/ThemedText';
 
 export default function ProfileScreen() {
   const [variant, setVariant] = useState<'private' | 'public'>('private');
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { weatherData } = useWeather();
-  const { user } = useProfile(1);
+
+  useEffect(() => {
+    loadUserProfile();
+  }, []);
+
+  const loadUserProfile = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const userData = await userService.getCurrentUser();
+      setUser(userData);
+    } catch (err) {
+      console.error('Failed to load profile:', err);
+      setError('Failed to load profile data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleToggleVariant = () => {
     setVariant(prev => prev === 'private' ? 'public' : 'private');
   };
 
-  const defaultUser: Partial<User> = {
-    username: 'Anonymous',
-    bio: 'No Bio',
-    profileImage: require('@/assets/images/avatar.png'),
-    followers: [], 
-    followings: [], 
-  };
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" />
+          <ThemedText>Loading profile...</ThemedText>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
-  const userData = user || defaultUser;
+  if (error) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.errorContainer}>
+          <ThemedText style={styles.errorText}>{error}</ThemedText>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <HeaderModal
           variant={variant}
-          user={userData as User}
+          user={user}
           location="Ouarzazat"
           weather={weatherData ?? undefined}
           onToggleVariant={handleToggleVariant}
@@ -38,8 +74,8 @@ export default function ProfileScreen() {
           onSettingsPress={() => console.log('Settings pressed')}
           onNotificationPress={() => console.log('Notification pressed')}
           onBookmarkPress={() => console.log('Bookmark pressed')}
-          followersCount={userData.followers?.length || 0}
-          followingsCount={userData.followings?.length || 0}
+          followersCount={user.followers?.length || 0}
+          followingsCount={user.followings?.length || 0}
         />
         <BodyModal variant={variant} />
       </View>
@@ -50,12 +86,24 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   container: {
     flex: 1,
   },
-  bodyContainer: {
+  loadingContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    color: '#D32F2F',
+    textAlign: 'center',
   },
 });
