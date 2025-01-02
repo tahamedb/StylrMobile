@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { styles } from '../../Style/MotifSection';
 import { ClothingItem } from '@/types/api.types';
+
 export const MATERIALS = [
   'Coton',
   'Lin',
@@ -34,18 +35,30 @@ export const MATERIALS = [
 export type Material = typeof MATERIALS[number];
 
 interface MotifSectionProps {
-  initialMaterial: Material;
-  onUpdate: (value: string) => void;
+  initialMaterial?: string;
+  initialMaterials?: string[];
+  onUpdate: (field: keyof ClothingItem, value: any) => void;
 }
 
-export function MotifSection({ initialMaterial, onUpdate }: MotifSectionProps) {
-  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(initialMaterial || null);
+export function MotifSection({ initialMaterial, initialMaterials = [], onUpdate }: MotifSectionProps) {
+  const [selectedMaterials, setSelectedMaterials] = useState<string[]>(
+    initialMaterials.length > 0 ? initialMaterials : initialMaterial ? [initialMaterial] : []
+  );
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleMaterialPress = (material: Material) => {
-    const newMaterial = selectedMaterial === material ? null : material;
-    setSelectedMaterial(newMaterial);
-    onUpdate(newMaterial || '');
+  const handleMaterialPress = (material: string) => {
+    setSelectedMaterials(current => {
+      const isSelected = current.includes(material);
+      const newMaterials = isSelected
+        ? current.filter(m => m !== material)
+        : [...current, material];
+      
+      // Update both single material and materials array
+      onUpdate('material', newMaterials[0] || '');
+      onUpdate('materials', newMaterials);
+      
+      return newMaterials;
+    });
   };
 
   return (
@@ -58,10 +71,20 @@ export function MotifSection({ initialMaterial, onUpdate }: MotifSectionProps) {
           style={styles.selectionContainer}
           onPress={() => setIsExpanded(!isExpanded)}
         >
-          {selectedMaterial && (
-            <ThemedText style={styles.selectedText}>
-              {selectedMaterial}
-            </ThemedText>
+          {selectedMaterials.length > 0 && (
+            <View style={styles.selectedPatternsContainer}>
+              {selectedMaterials.length <= 2 ? (
+                selectedMaterials.map((material, index) => (
+                  <ThemedText key={material} style={styles.selectedText}>
+                    {material}{index < selectedMaterials.length - 1 ? ', ' : ''}
+                  </ThemedText>
+                ))
+              ) : (
+                <ThemedText style={styles.selectedText}>
+                  {selectedMaterials.length} matériaux sélectionnés
+                </ThemedText>
+              )}
+            </View>
           )}
           <IconSymbol
             name={isExpanded ? "chevron.up" : "chevron.right"}
@@ -79,13 +102,13 @@ export function MotifSection({ initialMaterial, onUpdate }: MotifSectionProps) {
               onPress={() => handleMaterialPress(material)}
               style={[
                 styles.patternTag,
-                selectedMaterial === material && styles.tagSelected
+                selectedMaterials.includes(material) && styles.tagSelected
               ]}
             >
               <ThemedText 
                 style={[
                   styles.tagText,
-                  selectedMaterial === material && styles.tagTextSelected
+                  selectedMaterials.includes(material) && styles.tagTextSelected
                 ]}
               >
                 {material}

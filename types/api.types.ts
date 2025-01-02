@@ -55,23 +55,24 @@ import { Occasion } from '../components/wardrobe/clothingDetail/Body/Information
 //!!ici ajouter champ brand  dans backend 
 
 export interface ClothingItem {
-    occasion: Occasion | undefined;
-    id: any;
+    id?: number;
     name: string;
     category: string;
     color: string;
     size: string;
     material: string;
+    materials: string[];
     season: string;
-    imageUrl: string;
-    createdAt: string;
-    updatedAt: string;
     brand: string;
     rating: number;
     price: number;
     purchaseDate: string;
     purchaseLink: string;
+    imageUrl: string;
     colors: string[];
+    occasion: Occasion | undefined;
+    createdAt: string;
+    updatedAt: string;
 }
 //Profile wardrobe Component
 export interface Wardrobe {
