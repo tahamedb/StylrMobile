@@ -43,7 +43,18 @@ const colors: Color[] = [
   { name: 'Magenta', hex: '#FF00FF' },
   { name: 'Or', hex: '#FFD700' },
   { name: 'Argent', hex: '#C0C0C0' },
-  { name: 'Coloré', hex: 'linear-gradient' }
+  { name: 'Coloré', hex: 'linear-gradient' },
+  { name: 'Gris', hex: '#808080' },
+  { name: 'Gris Charbon', hex: '#36454F' },
+  { name: 'Taupe', hex: '#483C32' },
+  { name: 'Bleu Clair', hex: '#ADD8E6' },
+  { name: 'Bleu Marine', hex: '#000080' },
+  { name: 'Bleu Canard', hex: '#008080' },
+  { name: 'Vert Lime', hex: '#32CD32' },
+  { name: 'Vert Foncé', hex: '#006400' },
+  { name: 'Menthe', hex: '#98FF98' },
+  { name: 'Beige Foncé', hex: '#D2B48C' },
+  { name: 'Bordeaux', hex: '#800020' }
 ];
 
 interface ColorSectionProps {

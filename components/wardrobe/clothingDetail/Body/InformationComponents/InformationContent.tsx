@@ -51,8 +51,9 @@ export function InformationContent({ clothingDetail, isNewItem, onUpdate }: Info
           onUpdate={(value) => onUpdate('colors', value)}
         />
         <MotifSection 
-          initialMaterial={clothingDetail.material as Material}
-          onUpdate={(value) => onUpdate('material', value)}
+          initialMaterial={clothingDetail.material}
+          initialMaterials={clothingDetail.materials}
+          onUpdate={onUpdate}
         />
         <MarqueSection 
           initialBrand={clothingDetail.brand || ''}

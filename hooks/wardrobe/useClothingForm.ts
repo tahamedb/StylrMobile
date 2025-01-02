@@ -6,6 +6,8 @@ import { uploadImageToCloudinary } from '@/services/Cloudinary/CloudinaryService
 export interface ClothingFormData extends Partial<ClothingItem> {
     imageBase64?: string;
     removeBackground?: boolean;
+    pattern?: string;
+    materials?: string[];
 }
 
 export function useClothingForm(initialData: Partial<ClothingItem>) {
@@ -23,6 +25,7 @@ export function useClothingForm(initialData: Partial<ClothingItem>) {
     purchaseDate: '',
     purchaseLink: '',
     colors: [],
+    materials: [], // Initialize materials array
     removeBackground: false, // Default to false
     // Spread the initial data over the defaults
     ...initialData
