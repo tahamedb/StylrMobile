@@ -1,57 +1,180 @@
 import { useState } from 'react';
+import { 
+  SafeAreaView, 
+  StyleSheet, 
+  FlatList, 
+  RefreshControl, 
+  Text, 
+  View,
+  Modal,
+  TextInput,
+  TouchableOpacity,
+  Share
+} from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { SearchBarWithList } from '@/components/SearchBarWithList';
 import { Post } from '@/components/Post';
-import { SafeAreaView, StyleSheet, FlatList, RefreshControl } from 'react-native';
-
-const DUMMY_POSTS = [
-  {
-    id: '1',
-    username: 'johndoe',
-    userAvatar: require('@/assets/images/react-logo.png'),
-    image: require('@/assets/images/react-logo.png'),
-    likes: 1234,
-    caption: 'Having a great time coding with React Native! 🚀 #coding #reactnative',
-    timeAgo: '2 hours ago',
-  },
-  {
-    id: '2',
-    username: 'janedoe',
-    userAvatar: require('@/assets/images/react-logo.png'),
-    image: require('@/assets/images/react-logo.png'),
-    likes: 856,
-    caption: 'Beautiful sunset today 🌅 #nature #photography',
-    timeAgo: '4 hours ago',
-  },
-];
+import { usePosts } from '@/hooks/usePosts';
+import { Post as PostType } from '@/types/api.types';
 
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { posts, setPosts, loading, error, fetchPosts } = usePosts();
+  const [commentModalVisible, setCommentModalVisible] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
+  const handleComment = (postId: number) => {
+    setSelectedPostId(postId);
+    setCommentModalVisible(true);
   };
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <ThemedView style={styles.container}>
-        {/* Utilisez FlatList */}
-        <FlatList
-          data={DUMMY_POSTS} // Afficher tous les posts sans filtrage
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <Post key={item.id} {...item} />}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-          ListHeaderComponent={
+  const submitComment = () => {
+    if (selectedPostId && commentText.trim()) {
+      // Update posts with new comment
+      const updatedPosts = posts.map(post => {
+        if (post.id === selectedPostId) {
+          return {
+            ...post,
+            comments: [...(post.comments || []), {
+              id: Date.now(),
+              content: commentText,
+              userId: 1, // Replace with actual user ID
+              username: 'Current User',
+              createdAt: new Date().toISOString()
+            }]
+          };
+        }
+        return post;
+      });
+      
+      // Add this line to update the posts state
+      setPosts(updatedPosts);
+      
+      setCommentText('');
+      setCommentModalVisible(false);
+    }
+  };
+
+  const handleShare = async (post: PostType) => {
+    try {
+      await Share.share({
+        message: `${post.content}\n${post.imageUrl || ''}`,
+        title: 'Share Post'
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  const renderItem = ({ item }: { item: PostType }) => {
+    return (
+      <Post 
+        key={item.id}
+        username="Anonymous"
+        userAvatar={require('@/assets/images/react-logo.png')}
+        image={item.imageUrl}
+        likes={item.likes || 0}
+        caption={item.content}
+        timeAgo={item.createdAt || new Date().toISOString()}
+        onComment={() => handleComment(item.id)}
+        onShare={() => handleShare(item)}
+        commentCount={item.comments?.length || 0}
+        comments={item.comments || []}
+      />
+    );
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchPosts();
+    setRefreshing(false);
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <ThemedView style={styles.container}>
+          <View style={styles.searchBarContainer}>
             <SearchBarWithList 
               searchQuery={searchQuery} 
               setSearchQuery={setSearchQuery} 
             />
+          </View>
+          <Text style={styles.messageText}>Loading posts...</Text>
+        </ThemedView>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <ThemedView style={styles.container}>
+          <View style={styles.searchBarContainer}>
+            <SearchBarWithList 
+              searchQuery={searchQuery} 
+              setSearchQuery={setSearchQuery} 
+            />
+          </View>
+          <Text style={styles.messageText}>{error}</Text>
+        </ThemedView>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ThemedView style={styles.container}>
+        <View style={styles.searchBarContainer}>
+          <SearchBarWithList 
+            searchQuery={searchQuery} 
+            setSearchQuery={setSearchQuery} 
+          />
+        </View>
+        <FlatList<PostType>
+          data={posts}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderItem}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         />
+
+        <Modal
+          visible={commentModalVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setCommentModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Add Comment</Text>
+              <TextInput
+                style={styles.commentInput}
+                value={commentText}
+                onChangeText={setCommentText}
+                placeholder="Write your comment..."
+                multiline
+              />
+              <View style={styles.modalButtons}>
+                <TouchableOpacity 
+                  style={styles.cancelButton}
+                  onPress={() => setCommentModalVisible(false)}
+                >
+                  <Text>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.submitButton}
+                  onPress={submitComment}
+                >
+                  <Text style={styles.submitButtonText}>Comment</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </ThemedView>
     </SafeAreaView>
   );
@@ -60,8 +183,71 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: '#fff',
   },
   container: {
     flex: 1,
+  },
+  searchBarContainer: {
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    elevation: 2, // for Android shadow
+    shadowColor: '#000', // for iOS shadow
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    zIndex: 1, // Ensure search bar stays on top
+  },
+  messageText: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    color: '#666',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  commentInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 10,
+    minHeight: 100,
+    marginBottom: 15,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  cancelButton: {
+    marginRight: 15,
+    padding: 10,
+  },
+  submitButton: {
+    backgroundColor: '#1D9BF0',
+    padding: 10,
+    borderRadius: 20,
+    paddingHorizontal: 20,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

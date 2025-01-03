@@ -1,5 +1,6 @@
-import React, { Dispatch, SetStateAction } from 'react';
-import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, TextInput, View, FlatList, Image, Text, TouchableOpacity } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
 const dummyUsers = [
@@ -10,21 +11,18 @@ const dummyUsers = [
   { id: '5', name: 'Charlie Green', profileImage: require('../assets/images/react-logo.png') },
 ];
 
-// Définition des props du composant
 interface SearchBarWithListProps {
   searchQuery: string;
-  setSearchQuery: Dispatch<SetStateAction<string>>;
+  setSearchQuery: (query: string) => void;
 }
 
 export function SearchBarWithList({ searchQuery, setSearchQuery }: SearchBarWithListProps) {
   const router = useRouter();
-  
-  // Filtrer les utilisateurs uniquement si une recherche est effectuée
+  const [isFocused, setIsFocused] = useState(false);
+
   const filteredUsers = searchQuery.trim()
-    ? dummyUsers.filter(
-        (user) =>
-          user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.id.includes(searchQuery)
+    ? dummyUsers.filter(user => 
+        user.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : [];
 
@@ -34,81 +32,115 @@ export function SearchBarWithList({ searchQuery, setSearchQuery }: SearchBarWith
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
+      <View style={styles.searchBar}>
+        <AntDesign name="search1" size={20} color="#666" style={styles.searchIcon} />
         <TextInput
-          style={styles.searchInput}
-          placeholder="Search by name or ID"
-          placeholderTextColor="#888"
+          style={styles.input}
+          placeholder="Search"
           value={searchQuery}
           onChangeText={setSearchQuery}
-          keyboardType="default"
-          returnKeyType="search"
-          autoCapitalize="none"
-          autoCorrect={false}
+          placeholderTextColor="#666"
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
         />
       </View>
 
-      <FlatList
-        data={filteredUsers}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.userContainer}
-            onPress={() => handleUserPress(item.id)}
-          >
-            <Image source={item.profileImage} style={styles.avatar} />
-            <Text style={styles.userName}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-        ListEmptyComponent={() =>
-          searchQuery.trim() ? (
-            <Text style={styles.noResultsText}>No users found</Text>
-          ) : null
-        }
-      />
+      {isFocused && searchQuery.trim() !== '' && (
+        <View style={styles.resultsContainer}>
+          <FlatList
+            data={filteredUsers}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.userItem}
+                onPress={() => handleUserPress(item.id)}
+              >
+                <Image source={item.profileImage} style={styles.avatar} />
+                <View style={styles.userInfo}>
+                  <Text style={styles.userName}>{item.name}</Text>
+                  <Text style={styles.userHandle}>@{item.name.toLowerCase().replace(' ', '')}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+            ListEmptyComponent={() => (
+              <Text style={styles.noResults}>No results for "{searchQuery}"</Text>
+            )}
+          />
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
+    width: '100%',
+    zIndex: 1,
   },
-  searchContainer: {
-    marginBottom: 16,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-  },
-  searchInput: {
-    fontSize: 16,
-    height: 40,
-    color: '#000',
-  },
-  userContainer: {
+  searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    height: 40,
+    marginHorizontal: 15,
+    marginVertical: 10,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: '#000',
+    height: '100%',
+  },
+  resultsContainer: {
+    position: 'absolute',
+    top: 60,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    maxHeight: 300,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 2,
+  },
+  userItem: {
+    flexDirection: 'row',
     padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#e1e8ed',
+    alignItems: 'center',
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  userInfo: {
+    marginLeft: 12,
   },
   userName: {
-    fontSize: 18,
-    color: '#333',
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#14171a',
   },
-  noResultsText: {
+  userHandle: {
+    fontSize: 14,
+    color: '#657786',
+  },
+  noResults: {
+    padding: 16,
     textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
-    color: '#888',
+    color: '#657786',
   },
 });

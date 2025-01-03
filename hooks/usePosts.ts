@@ -1,27 +1,32 @@
 import { useState, useEffect } from 'react';
-import { postsService } from '@/services/posts/postsServices';
 import { Post } from '@/types/api.types';
+import { postsService } from '@/services/posts/postsServices';
 
-export function usePosts() {
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
+export const usePosts = () => {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    const fetchPosts = async () => {
-        try {
-            setLoading(true);
-            const response = await postsService.getPosts();
-            setPosts(response.posts);
-        } catch (err) {
-            setError(err instanceof Error ? err : new Error('Unknown error'));
-        } finally {
-            setLoading(false);
-        }
-    };
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await postsService.getPosts();
+      if (Array.isArray(response)) {
+        setPosts(response);
+      } else {
+        setError("Format de réponse inattendu");
+      }
+    } catch (err) {
+      setError("Impossible de charger les posts");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-        fetchPosts();
-    }, []);
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
-    return { posts, loading, error, refetch: fetchPosts };
-}
+  return { posts, setPosts, loading, error, fetchPosts };
+};

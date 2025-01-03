@@ -14,25 +14,15 @@ export interface ApiResponse<T> {
 */
 export interface Post {
     id: number;
-    title?: string;
-    //body: string;
-    content:string;
-    tags?: string[];
-    reactions?: {
-    title?: string;
-    //body: string;
-    content:string;
-    tags?: string[];
-    reactions?: {
-        likes: number;
-        dislikes: number;
-    };
-    views?: number;
-    userId?: number;
+    content: string;
+    imageUrl?: string;
     createdAt?: string;
-    imageUrl?:string;
+    userId?: number;
+    likes?: number;
+    comments?: Comment[];
+    // ... other fields
 }
-}
+
 export interface PostCreation {
     content: string;
     imageUrl: string;
@@ -152,3 +142,11 @@ export interface LocationType  {
   export interface LocationSearchProps {
     onLocationSelect: (location: Location) => void;
   }
+
+export interface Comment {
+  id: number;
+  content: string;
+  userId: number;
+  username: string;
+  createdAt: string;
+}

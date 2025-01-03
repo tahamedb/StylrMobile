@@ -1,9 +1,9 @@
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View, Text } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
-import { IconSymbol } from './ui/IconSymbol';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colors } from '@/constants/Colors';
+import { AntDesign } from '@expo/vector-icons';
+import { useState } from 'react';
+import { getRelativeTime } from '@/utils/dateUtils';
 
 interface PostProps {
   username: string;
@@ -12,113 +12,188 @@ interface PostProps {
   likes: number;
   caption: string;
   timeAgo: string;
+  onComment?: () => void;
+  onLike?: () => void;
+  onShare?: () => void;
+  isLiked?: boolean;
+  commentCount?: number;
+  comments?: Array<{
+    id: number;
+    content: string;
+    username: string;
+    createdAt: string;
+  }>;
 }
 
-export function Post({ username, userAvatar, image, likes, caption, timeAgo }: PostProps) {
-  const theme = useColorScheme() ?? 'light';
-  const iconColor = Colors[theme].icon;
+export function Post({ 
+  username, 
+  userAvatar, 
+  image, 
+  likes, 
+  caption, 
+  timeAgo,
+  onComment,
+  onLike,
+  onShare,
+  isLiked = false,
+  commentCount = 0,
+  comments = []
+}: PostProps) {
+  const [liked, setLiked] = useState(isLiked);
+  const [likesCount, setLikesCount] = useState(likes);
+
+  const handleLike = () => {
+    setLiked(!liked);
+    setLikesCount(prev => liked ? prev - 1 : prev + 1);
+    onLike?.();
+  };
 
   return (
     <ThemedView style={styles.container}>
-      <View style={styles.header}>
+      <View style={styles.postHeader}>
         <View style={styles.userInfo}>
           <Image source={userAvatar} style={styles.avatar} />
-          <ThemedText type="defaultSemiBold">{username}</ThemedText>
+          <View>
+            <ThemedText type="defaultSemiBold">{username}</ThemedText>
+            <ThemedText style={styles.timeAgo}>{getRelativeTime(timeAgo)}</ThemedText>
+          </View>
         </View>
         <TouchableOpacity>
-          <IconSymbol name="ellipsis" size={24} color={iconColor} />
+          <AntDesign name="ellipsis1" size={24} color="#536471" />
         </TouchableOpacity>
       </View>
 
-      {image && (
-        <Image source={image} style={styles.postImage} resizeMode="cover" />
-      )}
+      <View style={styles.content}>
+        <ThemedText style={styles.caption}>{caption}</ThemedText>
+        {image && (
+          <Image 
+            source={typeof image === 'string' ? { uri: image } : image}
+            style={styles.postImage}
+            resizeMode="cover"
+          />
+        )}
+      </View>
 
       <View style={styles.actions}>
-        <View style={styles.leftActions}>
-          <TouchableOpacity style={styles.actionButton}>
-            <IconSymbol name="heart" size={24} color={iconColor} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
-            <IconSymbol name="bubble.right" size={24} color={iconColor} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
-            <IconSymbol name="paperplane.fill" size={24} color={iconColor} />
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity>
-          <IconSymbol name="bookmark" size={24} color={iconColor} />
+        <TouchableOpacity style={styles.actionButton} onPress={onComment}>
+          <AntDesign name="message1" size={20} color="#536471" />
+          <ThemedText style={styles.actionText}>{commentCount}</ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton}>
+          <AntDesign name="retweet" size={20} color="#536471" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
+          <AntDesign 
+            name={liked ? "heart" : "hearto"} 
+            size={20} 
+            color={liked ? "#F91880" : "#536471"} 
+          />
+          <ThemedText style={styles.actionText}>{likesCount}</ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton} onPress={onShare}>
+          <AntDesign name="sharealt" size={20} color="#536471" />
         </TouchableOpacity>
       </View>
 
-      <ThemedText type="defaultSemiBold" style={styles.likes}>
-        {likes.toLocaleString()} likes
-      </ThemedText>
-
-      <View style={styles.captionContainer}>
-        <ThemedText type="defaultSemiBold" style={styles.username}>
-          {username}
-        </ThemedText>
-        <ThemedText>{caption}</ThemedText>
-      </View>
-
-      <ThemedText style={styles.timeAgo}>{timeAgo}</ThemedText>
+      {comments && comments.length > 0 && (
+        <View style={styles.commentsSection}>
+          {comments.map(comment => (
+            <View key={comment.id} style={styles.commentContainer}>
+              <Text style={styles.commentUsername}>{comment.username}</Text>
+              <Text style={styles.commentContent}>{comment.content}</Text>
+              <Text style={styles.commentTime}>
+                {new Date(comment.createdAt).toLocaleDateString()}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EFF3F4',
+    paddingVertical: 12,
   },
-  header: {
+  postHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    padding: 12,
+    paddingHorizontal: 16,
   },
   userInfo: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
   avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
+  timeAgo: {
+    fontSize: 14,
+    color: '#536471',
+  },
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 4,
+  },
+  caption: {
+    fontSize: 15,
+    lineHeight: 20,
+    marginBottom: 12,
   },
   postImage: {
     width: '100%',
-    height: 400,
+    height: 200,
+    borderRadius: 16,
+    marginTop: 12,
   },
   actions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 12,
-  },
-  leftActions: {
-    flexDirection: 'row',
-    gap: 16,
+    justifyContent: 'space-around',
+    paddingTop: 12,
+    marginTop: 4,
   },
   actionButton: {
-    padding: 4,
-  },
-  likes: {
-    paddingHorizontal: 12,
-    marginBottom: 6,
-  },
-  captionContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 12,
-    gap: 6,
-    marginBottom: 4,
+    alignItems: 'center',
+    padding: 8,
+    gap: 4,
   },
-  username: {
-    marginRight: 4,
+  actionText: {
+    color: '#536471',
+    fontSize: 13,
+    marginLeft: 4,
   },
-  timeAgo: {
+  commentsSection: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#EFF3F4',
+    marginTop: 8,
+  },
+  commentContainer: {
+    marginBottom: 8,
+  },
+  commentUsername: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginBottom: 2,
+  },
+  commentContent: {
+    fontSize: 14,
+    lineHeight: 18,
+  },
+  commentTime: {
     fontSize: 12,
-    color: '#666',
-    paddingHorizontal: 12,
+    color: '#536471',
+    marginTop: 2,
   },
 }); 
