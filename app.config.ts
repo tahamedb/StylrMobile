@@ -3,7 +3,10 @@ export default {
     extra: {
       EXPO_PUBLIC_CLOUDINARY_URL: process.env.EXPO_PUBLIC_CLOUDINARY_URL,
       EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET: process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-      EXPO_PUBLIC_AUTH_TOKEN: process.env.EXPO_PUBLIC_AUTH_TOKEN, 
+      EXPO_PUBLIC_AUTH_TOKEN: process.env.EXPO_PUBLIC_AUTH_TOKEN,
     },
+    plugins: [
+      "expo-secure-store"
+    ],
   },
-}; 
+};
