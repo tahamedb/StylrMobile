@@ -10,10 +10,6 @@ export const useWardrobe = () => {
   const [error, setError] = useState<string | null>(null);
   const { currentWardrobe, wardrobes } = useWardrobeContext();
 
-  useEffect(() => {
-    fetchWardrobeData();
-  }, [currentWardrobe]);
-
   const fetchWardrobeData = async () => {
     setIsLoading(true);
     setError(null);
@@ -21,6 +17,9 @@ export const useWardrobe = () => {
       let items: ClothingItem[] = [];
       if (currentWardrobe) {
         items = await wardrobeService.getWardrobeItems(currentWardrobe.id);
+      } else {
+        // Load all clothing items when no wardrobe is selected
+        items = await wardrobeService.getAllClothingItems();
       }
       setWardrobeData(items || []);
     } catch (err) {
@@ -31,6 +30,12 @@ export const useWardrobe = () => {
       setIsLoading(false);
     }
   };
+
+  // Load data immediately and when currentWardrobe changes
+  useEffect(() => {
+    console.log('Loading wardrobe data...');
+    fetchWardrobeData();
+  }, [currentWardrobe]);
 
   return {
     wardrobeData,

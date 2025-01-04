@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, Alert, RefreshControl } from 'react-native';
 import { Lock, AlertCircle, Shirt, Eye, Trash2 } from 'lucide-react-native';
 import { useWardrobe } from '@/hooks/profile/BodyModal/useWardrobe';
 import { useProfile } from '@/hooks/profile/HeaderModal/useProfile';
 import { styles } from './styles';
 import { useRouter } from 'expo-router';
-import { Wardrobe as WardrobeType } from '@/types/api.types';
+import { Wardrobe as WardrobeType, ClothingItem } from '@/types/api.types';
 import { WardrobeModal } from '@/components/wardrobe/WardrobeModal';
 import { wardrobeService } from '@/services/wardrobe/wardrobeService';
 import { useWardrobe as useWardrobeContext } from '@/contexts/WardrobeContext';
@@ -15,6 +15,7 @@ export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
   const { user } = useProfile(1);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [allClothingItems, setAllClothingItems] = useState<ClothingItem[]>([]);
   const { 
     wardrobeData, 
     wardrobes = [], 
@@ -25,17 +26,35 @@ export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
   } = useWardrobe();
   const { refreshWardrobes } = useWardrobeContext();
 
+  // Load all clothing items on mount
+  useEffect(() => {
+    loadAllClothingItems();
+  }, []);
+
+  const loadAllClothingItems = async () => {
+    try {
+      const items = await wardrobeService.getAllClothingItems();
+      setAllClothingItems(items || []);
+    } catch (err) {
+      console.error('Error loading all clothing items:', err);
+    }
+  };
+
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      await Promise.all([refetch(), refreshWardrobes()]);
+      await Promise.all([
+        refetch(), 
+        refreshWardrobes(),
+        loadAllClothingItems()
+      ]);
     } finally {
       setRefreshing(false);
     }
   };
 
-  const totalItems = (wardrobeData || []).length;
-  const previewItems = (wardrobeData || []).slice(0, 4);
+  const totalItems = allClothingItems.length;
+  const previewItems = allClothingItems.slice(0, 4);
 
   const sortedWardrobes = useMemo(() => {
     const wardrobe_array = wardrobes || [];
@@ -140,7 +159,10 @@ export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
             try {
               await wardrobeService.deleteWardrobe(wardrobe.id);
               // Refresh both the wardrobe data and the wardrobes list
-              await refreshWardrobes();
+              await Promise.all([
+                refreshWardrobes(),
+                loadAllClothingItems()
+              ]);
               // If this was the current wardrobe, navigate back
               if (currentWardrobe?.id === wardrobe.id) {
                 router.back();

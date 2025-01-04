@@ -145,4 +145,14 @@ export const wardrobeService = {
       throw error;
     }
   },
+
+  async getClothingItemDirectly(clothingId: number): Promise<ClothingItem | null> {
+    try {
+        const response = await apiClientWrapper.get<ClothingItem>(`/clothing-items/${clothingId}`);
+      return response;
+    } catch (error) {
+      console.error('Error fetching clothing item directly:', error);
+      return null;
+    }
+  },
 };

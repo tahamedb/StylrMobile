@@ -10,7 +10,7 @@ export function useWardrobeContent() {
   const [activeTab, setActiveTab] = useState<Tab>('tous');
   const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
   const [outfits, setOutfits] = useState<Outfit[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   // Get the current view type from URL params
@@ -20,6 +20,8 @@ export function useWardrobeContent() {
 
   // Define loadData function
   const loadData = useCallback(async () => {
+    if (loading) return; // Prevent multiple simultaneous loads
+    
     try {
       setLoading(true);
       setError(null);
@@ -42,31 +44,27 @@ export function useWardrobeContent() {
         outfits: outfitsList.length,
         viewType: isSpecificWardrobe ? 'specific' : 'all'
       });
-      setClothingItems(items);
-      setOutfits(outfitsList);
+      
+      // Only update state if we got valid data
+      if (Array.isArray(items)) {
+        setClothingItems(items);
+      }
+      if (Array.isArray(outfitsList)) {
+        setOutfits(outfitsList);
+      }
     } catch (err) {
       console.error('Error loading wardrobe content:', err);
       setError(err instanceof Error ? err : new Error('Failed to load items'));
     } finally {
       setLoading(false);
     }
-  }, [isSpecificWardrobe, wardrobeId]);
+  }, [isSpecificWardrobe, wardrobeId, loading]);
 
-  // Load data when params change
+  // Initial load and reload when parameters change
   useEffect(() => {
-    let mounted = true;
-    
-    async function fetchData() {
-      if (!mounted) return;
-      await loadData();
-    }
-
-    fetchData();
-
-    return () => {
-      mounted = false;
-    };
-  }, [loadData]);
+    console.log('Loading wardrobe content...');
+    loadData();
+  }, [isSpecificWardrobe, wardrobeId]);
 
   const displayedItems = useMemo(() => {
     switch (activeTab) {
@@ -86,7 +84,7 @@ export function useWardrobeContent() {
     setActiveTab,
     clothingItems: displayedItems,
     outfitsData: outfits,
-    showEmptyState: displayedItems.length === 0,
+    showEmptyState: !loading && displayedItems.length === 0,
     totalItems: clothingItems.length,
     displayedCount: displayedItems.length,
     loading,

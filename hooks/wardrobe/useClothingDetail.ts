@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { wardrobeService } from '@/services/wardrobe/wardrobeService';
 import { ClothingItem } from '@/types/api.types';
 import { useWardrobe } from '@/contexts/WardrobeContext';
@@ -15,21 +15,31 @@ export function useClothingDetail(clothingId: number, shouldFetch: boolean = tru
     setError(null);
     setClothingDetail(null);
 
-    // Don't fetch if we don't have all required data
-    if (!shouldFetch || !currentWardrobe || !clothingId) {
+    // Don't fetch if we don't have the clothing ID or shouldn't fetch
+    if (!shouldFetch || !clothingId) {
       setLoading(false);
       return;
     }
 
     try {
-      console.log('Fetching clothing detail:', { wardrobeId: currentWardrobe.id, clothingId });
-      const response = await wardrobeService.getClothingItemById(currentWardrobe.id, clothingId);
+      let response: ClothingItem | null = null;
+
+      if (currentWardrobe) {
+        // If we have a current wardrobe, try to get the item from that wardrobe
+        console.log('Fetching clothing detail from wardrobe:', { wardrobeId: currentWardrobe.id, clothingId });
+        response = await wardrobeService.getClothingItemById(currentWardrobe.id, clothingId);
+      }
+
+      // If we didn't find it in the current wardrobe (or don't have one), try to get it directly
+      if (!response) {
+        console.log('Fetching clothing detail directly:', { clothingId });
+        response = await wardrobeService.getClothingItemDirectly(clothingId);
+      }
       
-      // If we got a response, the item belongs to the wardrobe
       if (response) {
         setClothingDetail(response);
       } else {
-        setError(new Error('Vêtement non trouvé dans cette garde-robe'));
+        setError(new Error('Vêtement non trouvé'));
       }
     } catch (err) {
       console.error('Erreur lors de la récupération des détails:', err);
@@ -39,25 +49,10 @@ export function useClothingDetail(clothingId: number, shouldFetch: boolean = tru
     }
   }, [clothingId, currentWardrobe, shouldFetch]);
 
-  // Reset everything when wardrobe changes
+  // Fetch data when dependencies change
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchData = async () => {
-      if (!isMounted) return;
-      await fetchClothingDetail();
-    };
-
-    fetchData();
-
-    return () => {
-      isMounted = false;
-      // Clear all state when unmounting or wardrobe changes
-      setClothingDetail(null);
-      setError(null);
-      setLoading(false);
-    };
-  }, [currentWardrobe?.id, fetchClothingDetail]);
+    fetchClothingDetail();
+  }, [fetchClothingDetail]);
 
   return {
     clothingDetail,
@@ -65,4 +60,4 @@ export function useClothingDetail(clothingId: number, shouldFetch: boolean = tru
     error,
     refetch: fetchClothingDetail
   };
-}
+};
