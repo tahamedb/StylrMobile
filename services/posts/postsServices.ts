@@ -1,5 +1,5 @@
 import { apiClientWrapper } from '../api/client';
-import { Post, PostsResponse } from '@/types/api.types';
+import { Post, PostCreation } from '@/types/api.types';
 
 export const postsService = {
   async getPosts(): Promise<Post[]> {
@@ -12,4 +12,14 @@ export const postsService = {
       throw error;
     }
   },
+
+  async createPost(postData: PostCreation): Promise<Post> {
+    try {
+      const response = await apiClientWrapper.post<Post>('/posts', postData);
+      return response;
+    } catch (error) {
+      console.error('Error creating post:', error);
+      throw error;
+    }
+  }
 };

@@ -42,6 +42,16 @@ class UserService {
       throw error;
     }
   }
+
+  async getUserById(userId: number): Promise<User> {
+    try {
+      const response = await apiClientWrapper.get<User>(`/users/${userId}`);
+      return response;
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      throw error;
+    }
+  }
 }
 
 export const userService = UserService.getInstance(); 

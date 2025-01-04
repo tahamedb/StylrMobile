@@ -17,9 +17,12 @@ export function useUsers(searchQuery: string) {
       
       setLoading(true);
       try {
+        console.log('Searching for:', searchQuery);
         const response = await userService.searchUsers(searchQuery);
+        console.log('Search response:', response);
         setUsers(response);
       } catch (err) {
+        console.error('Search error:', err);
         setError('Failed to search users');
       } finally {
         setLoading(false);

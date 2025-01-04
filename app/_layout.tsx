@@ -1,12 +1,13 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SplashScreen } from "expo-router";
-import {DarkTheme, DefaultTheme, ThemeProvider} from "@react-navigation/native";
+import { DarkTheme, DefaultTheme } from "@react-navigation/native";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import { useFonts } from "expo-font";
 import { UserProvider } from '@/contexts/UserContext';
 import { useProtectedRoute } from './_auth';
+import { ThemeProvider as CustomThemeProvider } from '@/context/ThemeContext';
 
 // Import your global CSS file (required for NativeWind)
 import "../global.css";
@@ -67,11 +68,11 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <CustomThemeProvider>
       <UserProvider>
         <RootLayoutNav />
         <StatusBar style="auto" />
       </UserProvider>
-    </ThemeProvider>
+    </CustomThemeProvider>
   );
 }

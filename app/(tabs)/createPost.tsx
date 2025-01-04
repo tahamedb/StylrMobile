@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Alert,
   Button,
@@ -16,7 +16,11 @@ import ArrowBack from "@/components/ui/ArrowBack";
 import ImageIcon from "@/assets/icons/Image";
 import ButtonPost from "@/components/ui/Button";
 import { postsService } from "@/services/posts/postsServices";
-import { PostCreation } from "@/types/api.types";
+import { PostCreation, User } from "@/types/api.types";
+import { userService } from "@/services/user/userService";
+import { ThemedView } from "@/components/ThemedView";
+import { ThemedText } from "@/components/ThemedText";
+import { useTheme } from "@/context/ThemeContext";
 
 // Cloudinary configuration
 const CLOUDINARY_URL = process.env.EXPO_PUBLIC_CLOUDINARY_URL;
@@ -65,9 +69,25 @@ export const uploadImageToCloudinary = async (
 };
 
 export default function CreatePost() {
+  const { colors } = useTheme();
   const [content, setContent] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const user = await userService.getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+        Alert.alert('Error', 'Failed to load user information');
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   // Image Picker
   const pickImage = async () => {
@@ -139,47 +159,60 @@ export default function CreatePost() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <ArrowBack />
-          <Text style={styles.headerTitle}>Create Post</Text>
-          <View></View>
-        </View>
-        <View style={styles.userInfo}>
-          <RNImage
-            source={require("@/assets/images/defaultUser.png")}
-            style={styles.userImage}
-          />
-          <View>
-            <Text style={styles.userName}>Ibtissam Hadiq</Text>
-            <Text style={styles.userStatus}>Public</Text>
-          </View>
-        </View>
-        <TextInput
-          placeholder="What's on your mind?"
-          style={styles.textInput}
-          value={content}
-          onChangeText={setContent}
-        />
-        <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
-          <ImageIcon />
-          <Text style={styles.imagePickerText}>Select an Image</Text>
-        </TouchableOpacity>
-        {isUploading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ) : (
-          imageUrl && (
-            <RNImage source={{ uri: imageUrl }} style={styles.selectedImage} />
-          )
-        )}
-        <ButtonPost
-          title="Post"
-          OnPress={handleSubmit}
-          href={"/(tabs)/homeScreen"}
-        />
+    <ThemedView style={styles.container}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <ArrowBack />
+        <ThemedText style={styles.headerTitle}>Create Post</ThemedText>
+        <View></View>
       </View>
-    </SafeAreaView>
+
+      <View style={styles.userInfo}>
+        <RNImage
+          source={currentUser?.profileImage 
+            ? { uri: currentUser.profileImage }
+            : require("@/assets/images/defaultUser.png")}
+          style={styles.userImage}
+        />
+        <View>
+          <ThemedText style={styles.userName}>{currentUser?.username || 'Loading...'}</ThemedText>
+          <ThemedText style={[styles.userStatus, { color: colors.text }]}>Public</ThemedText>
+        </View>
+      </View>
+
+      <TextInput
+        placeholder="What's on your mind?"
+        placeholderTextColor={colors.text + '80'}
+        style={[styles.textInput, { 
+          borderColor: colors.border,
+          color: colors.text,
+          backgroundColor: colors.card
+        }]}
+        value={content}
+        onChangeText={setContent}
+      />
+
+      <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+        <ImageIcon />
+        <ThemedText style={styles.imagePickerText}>Select an Image</ThemedText>
+      </TouchableOpacity>
+
+      {isUploading ? (
+        <ActivityIndicator size="large" color={colors.primary} />
+      ) : (
+        imageUrl && (
+          <RNImage 
+            source={{ uri: imageUrl }} 
+            style={[styles.selectedImage, { borderColor: colors.border }]} 
+          />
+        )
+      )}
+
+      <ButtonPost
+        title="Post"
+        OnPress={handleSubmit}
+        href={"/(tabs)/homeScreen"}
+      />
+    </ThemedView>
   );
 }
 
@@ -193,6 +226,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    borderBottomWidth: 1,
+    paddingBottom: 10,
   },
   headerTitle: {
     fontSize: 24,
@@ -215,16 +250,13 @@ const styles = StyleSheet.create({
   userStatus: {
     fontWeight: "600",
     fontSize: 18,
-    color: "#666",
   },
   textInput: {
     padding: 12,
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 10,
     fontSize: 16,
     fontWeight: "600",
-    color: "#555",
   },
   imagePicker: {
     flexDirection: "row",
@@ -235,13 +267,11 @@ const styles = StyleSheet.create({
   imagePickerText: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#555",
   },
   selectedImage: {
     width: "100%",
     height: 160,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
   },
 });

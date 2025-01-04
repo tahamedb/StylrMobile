@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 // For Android physical device, use your computer's local IP address
 const BASE_URL = Platform.select({
     ios: 'http://localhost:8088',
-    android: 'http://192.168.1.6:8088', // Replace with your actual IP address
+    android: 'http://192.168.100.115:8088', // Replace with your actual IP address
 });
 
 if (!BASE_URL) {

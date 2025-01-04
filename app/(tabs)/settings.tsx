@@ -1,24 +1,16 @@
 import React from 'react';
-import {View, Text, Switch, Button, StyleSheet, SafeAreaView} from 'react-native';
-import { useColorScheme } from 'react-native';
+import { View, Switch, Button, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { authService } from '@/services/auth/authService';
 import { useUser } from '@/contexts/UserContext';
+import { useTheme } from '@/context/ThemeContext';
+import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '@/components/ThemedText';
 
 const SettingsScreen = () => {
-    const colorScheme = useColorScheme();
     const router = useRouter();
     const { setUser } = useUser();
-
-    const toggleTheme = () => {
-        // Implement theme toggle logic
-        console.log('Toggle theme');
-    };
-
-    const changeLanguage = () => {
-        // Implement language change logic
-        console.log('Change language');
-    };
+    const { isDark, toggleTheme, colors } = useTheme();
 
     const handleLogout = async () => {
         try {
@@ -31,56 +23,62 @@ const SettingsScreen = () => {
     };
 
     const viewTOS = () => {
-        // Implement TOS view logic
         console.log('TOS');
     };
 
     const changeCredentials = () => {
-        // Implement credentials change logic
         console.log('change credentials');
     };
 
-    return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.container}>
-                <Text style={styles.header}>Settings</Text>
+    const changeLanguage = () => {
+        console.log('Change language');
+    };
 
-                <View style={styles.settingItem}>
-                    <Text style={styles.settingText}>Dark Mode</Text>
+    return (
+        <ThemedView style={styles.container}>
+            <View style={[styles.innerContainer, { borderColor: colors.border }]}>
+                <ThemedText style={styles.header}>Settings</ThemedText>
+
+                <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+                    <ThemedText style={styles.settingText}>Dark Mode</ThemedText>
                     <Switch
-                        value={colorScheme === 'dark'}
+                        value={isDark}
                         onValueChange={toggleTheme}
+                        trackColor={{ false: '#767577', true: colors.primary }}
+                        thumbColor={isDark ? '#f5dd4b' : '#f4f3f4'}
                     />
                 </View>
 
-                <View style={styles.settingItem}>
-                    <Text style={styles.settingText}>Language</Text>
-                    <Button title="Change Language" onPress={changeLanguage} />
+                <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+                    <ThemedText style={styles.settingText}>Language</ThemedText>
+                    <Button title="Change Language" onPress={changeLanguage} color={colors.primary} />
                 </View>
 
-                <View style={styles.settingItem}>
-                    <Text style={styles.settingText}>Credentials</Text>
-                    <Button title="Change Credentials" onPress={changeCredentials} />
+                <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+                    <ThemedText style={styles.settingText}>Credentials</ThemedText>
+                    <Button title="Change Credentials" onPress={changeCredentials} color={colors.primary} />
                 </View>
 
-                <View style={styles.settingItem}>
-                    <Text style={styles.settingText}>Terms of Service</Text>
-                    <Button title="View Terms of Service" onPress={viewTOS} />
+                <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+                    <ThemedText style={styles.settingText}>Terms of Service</ThemedText>
+                    <Button title="View Terms of Service" onPress={viewTOS} color={colors.primary} />
                 </View>
 
                 <View style={styles.logoutButton}>
                     <Button title="Logout" onPress={handleLogout} color="#FF3B30" />
                 </View>
             </View>
-        </SafeAreaView>
+        </ThemedView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    innerContainer: {
+        flex: 1,
         padding: 20,
-        backgroundColor: '#F5F5F5',
     },
     header: {
         fontSize: 24,
@@ -92,6 +90,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
     },
     settingText: {
         fontSize: 18,

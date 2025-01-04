@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, TextInput, View, FlatList, Image, Text, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -13,10 +13,33 @@ export function SearchBarWithList({ searchQuery, setSearchQuery }: SearchBarWith
   const router = useRouter();
   const [isFocused, setIsFocused] = useState(false);
   const { users, loading } = useUsers(searchQuery);
+
+  useEffect(() => {
+    console.log('Users data:', users);
+  }, [users]);
   
-  const handleUserPress = (userId: string) => {
-    router.push(`/user/${userId}`);
-    setIsFocused(false);
+  const handleUserPress = (userId: number) => {
+    try {
+      console.log('Before navigation - userId:', userId);
+      router.push({
+        pathname: '/(modal)/publicProfile/[id]',
+        params: { id: userId.toString() }
+      });
+      console.log('After navigation attempt');
+      setIsFocused(false);
+      setSearchQuery('');
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
+  };
+
+  const onUserPress = (item: any) => {
+    console.log('User pressed:', item);
+    if (item && item.id) {
+      handleUserPress(item.id);
+    } else {
+      console.error('Invalid user item:', item);
+    }
   };
 
   return (
@@ -41,11 +64,14 @@ export function SearchBarWithList({ searchQuery, setSearchQuery }: SearchBarWith
           ) : (
             <FlatList
               data={users}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => {
+                console.log('Item in keyExtractor:', item);
+                return item.id.toString();
+              }}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.userItem}
-                  onPress={() => handleUserPress(item.id.toString())}
+                  onPress={() => onUserPress(item)}
                 >
                   <Image 
                     source={item.profileImage ? { uri: item.profileImage } : require('@/assets/images/react-logo.png')} 

@@ -6,6 +6,7 @@ import { User } from '@/types/api.types';
 import { BodyModal } from '@/components/Profile/BodyModal/TabBar';
 import { userService } from '@/services/user/userService';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 
 export default function ProfileScreen() {
   const [variant, setVariant] = useState<'private' | 'public'>('private');
@@ -62,24 +63,22 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <HeaderModal
-          variant={variant}
-          user={user}
-          location="Ouarzazat"
-          weather={weatherData ?? undefined}
-          onToggleVariant={handleToggleVariant}
-          onCalendarPress={() => console.log('Calendar pressed')}
-          onSettingsPress={() => console.log('Settings pressed')}
-          onNotificationPress={() => console.log('Notification pressed')}
-          onBookmarkPress={() => console.log('Bookmark pressed')}
-          followersCount={user.followers?.length || 0}
-          followingsCount={user.followings?.length || 0}
-        />
-        <BodyModal variant={variant} />
-      </View>
-    </SafeAreaView>
+    <ThemedView style={styles.container}>
+      <HeaderModal
+        variant={variant}
+        user={user}
+        location="Ouarzazat"
+        weather={weatherData ?? undefined}
+        onToggleVariant={handleToggleVariant}
+        onCalendarPress={() => console.log('Calendar pressed')}
+        onSettingsPress={() => console.log('Settings pressed')}
+        onNotificationPress={() => console.log('Notification pressed')}
+        onBookmarkPress={() => console.log('Bookmark pressed')}
+        followersCount={user.followers?.length || 0}
+        followingsCount={user.followings?.length || 0}
+      />
+      <BodyModal variant={variant} />
+    </ThemedView>
   );
 }
 
