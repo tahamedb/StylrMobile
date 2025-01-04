@@ -17,7 +17,9 @@ interface ClothingDetailViewProps {
   date: string;
   isDark: boolean;
   clothingDetail: ClothingItem;
-  isNewItem?: boolean;
+  isNewItem: boolean;
+  onSave: (itemData: Partial<ClothingItem>) => Promise<void>;
+  isSubmitting: boolean;
 }
 
 export function ClothingDetailView({ 
@@ -26,7 +28,9 @@ export function ClothingDetailView({
   date, 
   isDark, 
   clothingDetail,
-  isNewItem 
+  isNewItem,
+  onSave,
+  isSubmitting
 }: ClothingDetailViewProps) {
   const [activeTab, setActiveTab] = useState<'information' | 'tenue'>('information');
   const [isPredicting, setIsPredicting] = useState(false);
@@ -129,7 +133,7 @@ export function ClothingDetailView({
         isDark={isDark} 
         isNewItem={isNewItem}
         onSave={handleSave}
-        isSaving={isSaving}
+        isSaving={isSubmitting}
         removeBackground={formData.removeBackground}
         onToggleBackground={handleToggleBackground}
       />

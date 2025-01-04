@@ -7,6 +7,7 @@ import { useColorScheme } from "react-native";
 import { useFonts } from "expo-font";
 import { UserProvider } from '@/contexts/UserContext';
 import { useProtectedRoute } from './_auth';
+import { WardrobeProvider } from '@/contexts/WardrobeContext';
 
 // Import your global CSS file (required for NativeWind)
 import "../global.css";
@@ -69,8 +70,10 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <UserProvider>
-        <RootLayoutNav />
-        <StatusBar style="auto" />
+        <WardrobeProvider>
+          <RootLayoutNav />
+          <StatusBar style="auto" />
+        </WardrobeProvider>
       </UserProvider>
     </ThemeProvider>
   );

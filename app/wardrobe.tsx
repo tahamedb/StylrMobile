@@ -1,39 +1,73 @@
-import { StyleSheet, View, ScrollView, SafeAreaView, ActivityIndicator,Pressable } from 'react-native';
-import { Stack } from 'expo-router';
+import { StyleSheet, View, ScrollView, SafeAreaView, ActivityIndicator, Pressable } from 'react-native';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Header } from '@/components/wardrobe/wardrobeHome/Header/Header';
 import { TabSelector } from '@/components/wardrobe/wardrobeHome/Body/TabSelector';
 import { ClothingCard } from '@/components/wardrobe/wardrobeHome/Body/ClothingCard';
+import { OutfitCard } from '@/components/wardrobe/wardrobeHome/Body/OutfitCard';
 import { EmptyState } from '@/components/wardrobe/wardrobeHome/Body/EmptyState';
+import { WardrobeModal } from '@/components/wardrobe/WardrobeModal';
 import { useWardrobeContent } from '@/hooks/wardrobe/useWardrobeContent';
+import { useOutfits } from '@/hooks/profile/BodyModal/useOutfits';
 import { ThemedText } from '@/components/ThemedText';
-
+import { useEffect, useState } from 'react';
+import { useWardrobe } from '@/contexts/WardrobeContext';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function WardrobeScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const fetchClothingItems = useWardrobeContent();
+  const params = useLocalSearchParams();
+  const { setCurrentWardrobe, wardrobes } = useWardrobe();
+  const [showCreateModal, setShowCreateModal] = useState(false);
   
   const {
     clothingItems,
-    loading,
-    error,
+    loading: itemsLoading,
+    error: itemsError,
     activeTab,
     setActiveTab,
     totalItems,
     displayedCount,
-  
   } = useWardrobeContent();
 
+  const {
+    outfitsData,
+    isLoading: outfitsLoading,
+    error: outfitsError,
+  } = useOutfits();
+
+  // Set current wardrobe from params
+  useEffect(() => {
+    const isSpecificWardrobe = params.isSpecificWardrobe === 'true';
+    
+    if (isSpecificWardrobe && params.id) {
+      const wardrobe = wardrobes.find(w => w.id === Number(params.id));
+      if (wardrobe) {
+        setCurrentWardrobe(wardrobe);
+      }
+    } else {
+      // If we're in "Tous les vêtements" view or any other case, clear the current wardrobe
+      setCurrentWardrobe(null);
+    }
+
+    // Cleanup when screen unmounts
+    return () => {
+      setCurrentWardrobe(null); // Reset wardrobe when leaving screen
+    };
+  }, [params.id, params.isSpecificWardrobe, wardrobes]);
+
+  const loading = itemsLoading || outfitsLoading;
+  const error = itemsError || outfitsError;
 
   if (loading) {
     return (
       <SafeAreaView style={[styles.container, isDark && styles.containerDark]}>
-        <View style={styles.debugInfo}>
-          <ThemedText>Chargement en cours...</ThemedText>
-          <ThemedText>État: {loading ? 'Loading' : 'Ready'}</ThemedText>
+        <Stack.Screen options={{ headerShown: false }} />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={isDark ? 'white' : 'black'} />
+          <ThemedText style={styles.loadingText}>Chargement en cours...</ThemedText>
         </View>
-        <ActivityIndicator size="large" color={isDark ? 'white' : 'black'} />
       </SafeAreaView>
     );
   }
@@ -41,49 +75,82 @@ export default function WardrobeScreen() {
   if (error) {
     return (
       <SafeAreaView style={[styles.container, isDark && styles.containerDark]}>
-        <View style={styles.debugInfo}>
-          <ThemedText style={styles.errorText}>Erreur: {error.message}</ThemedText>
+        <Stack.Screen options={{ headerShown: false }} />
+        <View style={styles.errorContainer}>
+          <ThemedText style={styles.errorText}>
+            {error instanceof Error ? error.message : error}
+          </ThemedText>
           <Pressable style={styles.retryButton}>
-            <ThemedText>Réessayer</ThemedText>
+            <ThemedText style={styles.retryText}>Réessayer</ThemedText>
           </Pressable>
         </View>
       </SafeAreaView>
     );
   }
 
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'tous':
+        return (
+          <View style={styles.grid}>
+            {clothingItems.map((item) => (
+              <View key={item.id} style={styles.gridItem}>
+                <ClothingCard
+                  id={item.id}
+                  imageUrl={{ uri: item.imageUrl }}
+                  brand={item.name}
+                  date={new Date(item.createdAt).toLocaleDateString('fr-FR')}
+                />
+              </View>
+            ))}
+            {clothingItems.length === 0 && (
+              <View style={styles.emptyItem}>
+                <ThemedText style={styles.emptyText}>Aucun vêtement trouvé</ThemedText>
+                <ThemedText style={styles.emptySubText}>Ajoutez des vêtements à votre garde-robe</ThemedText>
+              </View>
+            )}
+          </View>
+        );
+      case 'tenues':
+        return (
+          <View style={styles.outfitsGrid}>
+            {outfitsData.map((outfit) => (
+              <View key={outfit.id} style={styles.outfitCard}>
+                <OutfitCard outfit={outfit} />
+              </View>
+            ))}
+            {outfitsData.length === 0 && (
+              <EmptyState
+                count={0}
+                total={0}
+                message="Aucune tenue trouvée"
+                subMessage="Créez votre première tenue"
+              />
+            )}
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <SafeAreaView style={[styles.container, isDark && styles.containerDark]}>
       <Stack.Screen options={{ headerShown: false }} />
       
       <Header onOptionsPress={() => {/* votre code */}} />
-      <TabSelector activeTab={activeTab} onTabChange={setActiveTab} />
-      
-      {/* a rendre component aprés */}
-
-      <View style={styles.debugInfo}>
-        <ThemedText>Cette partie sera modifiée par la suite pour contenir les items sélectionnés.</ThemedText>
-        <ThemedText></ThemedText>
-        <ThemedText></ThemedText>
+      <View style={styles.headerActions}>
+        <TabSelector activeTab={activeTab} onTabChange={setActiveTab} />
       </View>
       
       <ScrollView style={styles.content}>
-        <View style={styles.clothingGrid}>
-        {clothingItems.map((item) => (
-          <View key={item.id} style={styles.cardContainer}>
-            <ClothingCard
-              id={item.id}
-              imageUrl={{ uri: item.imageUrl }}
-              brand={item.name}
-              date={new Date(item.createdAt).toLocaleDateString()}
-            />
-          </View>
-        ))}
-        </View>
-        <EmptyState
-          count={displayedCount} 
-          total={totalItems}
-        />
+        {renderContent()}
       </ScrollView>
+
+      <WardrobeModal
+        visible={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -98,31 +165,90 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 12,
   },
-  clothingGrid: {
-    paddingTop: 16,
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    padding: 8,
+    gap: 8,
   },
-  cardContainer: {
-    width: '32%',
+  gridItem: {
+    width: '48%', // slightly less than 50% to account for gap
+    aspectRatio: 1,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  itemImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 4,
+  },
+  emptyItem: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '600',
     marginBottom: 8,
   },
-  errorText: {
-    textAlign: 'center',
-    marginTop: 20,
+  emptySubText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
   },
-  debugInfo: {
-    padding: 10,
-    backgroundColor: '#f0f0f0',
+  errorText: {
+    color: '#D32F2F',
+    textAlign: 'center',
+    marginBottom: 16,
   },
   retryButton: {
-    padding: 10,
-    backgroundColor: '#007AFF',
-    borderRadius: 5,
-    alignItems: 'center',
+    backgroundColor: '#000',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  retryText: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  outfitsGrid: {
+    padding: 16,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+  },
+  outfitCard: {
+    width: '47%',
   },
 });

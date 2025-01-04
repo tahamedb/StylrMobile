@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Pressable, StyleSheet } from 'react-native';
+import { View, Pressable } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { styles } from '../Style/TabSelector';
 
-type Tab = 'tous' | 'tops';
+type Tab = 'tous' | 'tops' | 'tenues';
 
 type TabSelectorProps = {
   activeTab: Tab;
@@ -34,6 +34,17 @@ export function TabSelector({ activeTab, onTabChange }: TabSelectorProps) {
           activeTab === 'tops' ? styles.activeTabText : (isDark && styles.tabTextDark)
         ]}>
           Tops
+        </ThemedText>
+      </Pressable>
+      <Pressable 
+        style={[styles.tab, activeTab === 'tenues' && styles.activeTab]}
+        onPress={() => onTabChange('tenues')}
+      >
+        <ThemedText style={[
+          styles.tabText,
+          activeTab === 'tenues' ? styles.activeTabText : (isDark && styles.tabTextDark)
+        ]}>
+          Tenues
         </ThemedText>
       </Pressable>
     </View>

@@ -46,7 +46,7 @@ export interface PostsResponse {
 
 // Start Wordrobe part 
 
-export type Tab = 'tous' | 'tops';
+export type Tab = 'tous' | 'tops' | 'tenues';
 
 
 import { Occasion } from '../components/wardrobe/clothingDetail/Body/InformationComponents/OccasionSection';
@@ -72,15 +72,35 @@ export interface ClothingItem {
     occasion: Occasion | undefined;
     createdAt: string;
     updatedAt: string;
+    wardrobe: {
+        id: number;
+    };
 }
 //Profile wardrobe Component
 export interface Wardrobe {
-    id: string;
+    id: number;
     name: string;
-    itemCount: number;
-    items: ClothingItem[];
-    isPublic: boolean; 
-  }
+    user: {
+        id: number;
+    };
+    createdAt: string;
+    updatedAt: string;
+    clothingItems?: ClothingItem[];
+    outfits?: Outfit[];
+}
+
+export interface Outfit {
+    id: number;
+    name?: string;
+    imageUrl?: string;
+    wardrobe: {
+        id: number;
+    };
+    createdAt: string;
+    updatedAt: string;
+    // Add other outfit fields as needed
+}
+
 //Profile Outfits Component 
 export type TabType = 'Idées' | 'Tenue du jour' | 'Recommandation';
 export type VariantType = 'private' | 'public';
