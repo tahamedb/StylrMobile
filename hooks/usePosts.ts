@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { postsService } from '@/services/posts/postsServices';
 import { Post } from '@/types/api.types';
+import { postsService } from '@/services/posts/postsServices';
 
 export function usePosts() {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -11,7 +11,7 @@ export function usePosts() {
         try {
             setLoading(true);
             const response = await postsService.getPosts();
-            setPosts(response.posts);
+            setPosts(response);
         } catch (err) {
             setError(err instanceof Error ? err : new Error('Unknown error'));
         } finally {
@@ -23,5 +23,5 @@ export function usePosts() {
         fetchPosts();
     }, []);
 
-    return { posts, loading, error, refetch: fetchPosts };
+    return { posts, setPosts, loading, error, refetch: fetchPosts };
 }

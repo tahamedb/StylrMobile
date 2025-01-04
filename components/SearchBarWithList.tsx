@@ -1,114 +1,136 @@
-import React, { Dispatch, SetStateAction } from 'react';
-import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, TextInput, View, FlatList, Image, Text, TouchableOpacity } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useUsers } from '@/hooks/searchUsers/useUsers';
 
-const dummyUsers = [
-  { id: '1', name: 'John Doe', profileImage: require('../assets/images/react-logo.png') },
-  { id: '2', name: 'Jane Smith', profileImage: require('../assets/images/react-logo.png') },
-  { id: '3', name: 'Alice Johnson', profileImage: require('../assets/images/react-logo.png') },
-  { id: '4', name: 'Bob Brown', profileImage: require('../assets/images/react-logo.png') },
-  { id: '5', name: 'Charlie Green', profileImage: require('../assets/images/react-logo.png') },
-];
-
-// Définition des props du composant
 interface SearchBarWithListProps {
   searchQuery: string;
-  setSearchQuery: Dispatch<SetStateAction<string>>;
+  setSearchQuery: (query: string) => void;
 }
 
 export function SearchBarWithList({ searchQuery, setSearchQuery }: SearchBarWithListProps) {
   const router = useRouter();
+  const [isFocused, setIsFocused] = useState(false);
+  const { users, loading } = useUsers(searchQuery);
   
-  // Filtrer les utilisateurs uniquement si une recherche est effectuée
-  const filteredUsers = searchQuery.trim()
-    ? dummyUsers.filter(
-        (user) =>
-          user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.id.includes(searchQuery)
-      )
-    : [];
-
   const handleUserPress = (userId: string) => {
     router.push(`/user/${userId}`);
+    setIsFocused(false);
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
+      <View style={styles.searchBar}>
+        <AntDesign name="search1" size={20} color="#666" style={styles.searchIcon} />
         <TextInput
-          style={styles.searchInput}
-          placeholder="Search by name or ID"
-          placeholderTextColor="#888"
+          style={styles.input}
+          placeholder="Search users..."
           value={searchQuery}
           onChangeText={setSearchQuery}
-          keyboardType="default"
-          returnKeyType="search"
-          autoCapitalize="none"
-          autoCorrect={false}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+          placeholderTextColor="#666"
         />
       </View>
 
-      <FlatList
-        data={filteredUsers}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.userContainer}
-            onPress={() => handleUserPress(item.id)}
-          >
-            <Image source={item.profileImage} style={styles.avatar} />
-            <Text style={styles.userName}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-        ListEmptyComponent={() =>
-          searchQuery.trim() ? (
-            <Text style={styles.noResultsText}>No users found</Text>
-          ) : null
-        }
-      />
+      {isFocused && searchQuery.trim() !== '' && (
+        <View style={styles.resultsContainer}>
+          {loading ? (
+            <Text style={styles.messageText}>Searching...</Text>
+          ) : (
+            <FlatList
+              data={users}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.userItem}
+                  onPress={() => handleUserPress(item.id.toString())}
+                >
+                  <Image 
+                    source={item.profileImage ? { uri: item.profileImage } : require('@/assets/images/react-logo.png')} 
+                    style={styles.avatar}
+                  />
+                  <View style={styles.userInfo}>
+                    <Text style={styles.userName}>{item.username}</Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+              ListEmptyComponent={() => (
+                <Text style={styles.messageText}>No users found</Text>
+              )}
+            />
+          )}
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 16,
+    width: '100%',
+    zIndex: 1000,
+    elevation: 3,
     backgroundColor: '#fff',
   },
-  searchContainer: {
-    marginBottom: 16,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-  },
-  searchInput: {
-    fontSize: 16,
-    height: 40,
-    color: '#000',
-  },
-  userContainer: {
+  searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 20,
+    margin: 10,
+    paddingHorizontal: 15,
+    height: 40,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: '#000',
+  },
+  resultsContainer: {
+    position: 'absolute',
+    top: 60,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    maxHeight: 300,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  userItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: '#f0f0f0',
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  userInfo: {
+    flex: 1,
   },
   userName: {
-    fontSize: 18,
-    color: '#333',
-  },
-  noResultsText: {
-    textAlign: 'center',
-    marginTop: 20,
     fontSize: 16,
-    color: '#888',
+    fontWeight: '500',
+  },
+  messageText: {
+    padding: 15,
+    textAlign: 'center',
+    color: '#666',
   },
 });

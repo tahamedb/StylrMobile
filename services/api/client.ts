@@ -4,7 +4,7 @@ import { authService } from '../auth/authService';
 
 const BASE_URL = Platform.select({
     ios: 'http://localhost:8088/api',
-    android: 'http://192.168.1.59:8088/api',
+    android: 'http://192.168.100.115:8088/api',
 });
 
 if (!BASE_URL) {

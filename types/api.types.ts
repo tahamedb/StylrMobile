@@ -14,25 +14,24 @@ export interface ApiResponse<T> {
 */
 export interface Post {
     id: number;
-    title?: string;
-    //body: string;
-    content:string;
-    tags?: string[];
-    reactions?: {
-    title?: string;
-    //body: string;
-    content:string;
-    tags?: string[];
+    content: string;
+    imageUrl?: string;
+    createdAt?: string;
+    userId?: number;
+    likes?: number;
     reactions?: {
         likes: number;
         dislikes: number;
     };
-    views?: number;
-    userId?: number;
-    createdAt?: string;
-    imageUrl?:string;
+    comments?: Array<{
+        id: number;
+        content: string;
+        username: string;
+        createdAt: string;
+    }>;
+    // ... other fields if needed
 }
-}
+
 export interface PostCreation {
     content: string;
     imageUrl: string;

@@ -1,32 +1,33 @@
 // useUsers.ts
 import { useState, useEffect } from 'react';
-import { fetchUsers,User } from '@/services/searchUsers/userServicesSearch';
+import { User } from '@/types/api.types';
+import { userService } from '@/services/user/userService';
+
 export function useUsers(searchQuery: string) {
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const getUsers = async () => {
+    const searchUsers = async () => {
+      if (!searchQuery.trim()) {
+        setUsers([]);
+        return;
+      }
+      
       setLoading(true);
-      setError(null);
       try {
-        const data = await fetchUsers(); 
-        setUsers(data);
+        const response = await userService.searchUsers(searchQuery);
+        setUsers(response);
       } catch (err) {
-        setError('Failed to fetch users');
+        setError('Failed to search users');
       } finally {
         setLoading(false);
       }
     };
 
-    getUsers();
-  }, []); 
+    searchUsers();
+  }, [searchQuery]);
 
-  // Filtrer les utilisateurs selon la recherche
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  return { filteredUsers, loading, error };
+  return { users, loading, error };
 }

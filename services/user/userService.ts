@@ -32,6 +32,16 @@ class UserService {
       throw error;
     }
   }
+
+  async searchUsers(query: string): Promise<User[]> {
+    try {
+      const response = await apiClientWrapper.get<User[]>(`/users/search/${query}`);
+      return response;
+    } catch (error) {
+      console.error('Error searching users:', error);
+      throw error;
+    }
+  }
 }
 
 export const userService = UserService.getInstance(); 
