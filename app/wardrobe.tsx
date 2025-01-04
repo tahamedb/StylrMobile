@@ -1,5 +1,5 @@
 import { StyleSheet, View, ScrollView, SafeAreaView, ActivityIndicator, Pressable } from 'react-native';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Header } from '@/components/wardrobe/wardrobeHome/Header/Header';
 import { TabSelector } from '@/components/wardrobe/wardrobeHome/Body/TabSelector';
@@ -10,17 +10,78 @@ import { WardrobeModal } from '@/components/wardrobe/WardrobeModal';
 import { useWardrobeContent } from '@/hooks/wardrobe/useWardrobeContent';
 import { useOutfits } from '@/hooks/profile/BodyModal/useOutfits';
 import { ThemedText } from '@/components/ThemedText';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useWardrobe } from '@/contexts/WardrobeContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+// The main screen component that handles the URL parameters and wardrobe selection
 export default function WardrobeScreen() {
+  const params = useLocalSearchParams();
+  const wardrobeId = params.id ? Number(params.id) : null;
+  const isSpecificWardrobe = params.isSpecificWardrobe === 'true';
+
+  // Create a unique key that changes whenever the URL parameters change
+  // This forces a complete remount of the wardrobe content
+  const screenKey = `wardrobe-${isSpecificWardrobe}-${wardrobeId || 'all'}`;
+
+  return (
+    <WardrobeScreenContent key={screenKey} wardrobeId={wardrobeId} isSpecificWardrobe={isSpecificWardrobe} />
+  );
+}
+
+// Separate component that gets remounted whenever the URL parameters change
+function WardrobeScreenContent({ 
+  wardrobeId, 
+  isSpecificWardrobe 
+}: { 
+  wardrobeId: number | null;
+  isSpecificWardrobe: boolean;
+}) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const params = useLocalSearchParams();
-  const { setCurrentWardrobe, wardrobes } = useWardrobe();
+  const router = useRouter();
+  const { setCurrentWardrobe, wardrobes, clearCurrentWardrobe } = useWardrobe();
   const [showCreateModal, setShowCreateModal] = useState(false);
-  
+
+  // Set up the wardrobe when this component mounts
+  useEffect(() => {
+    console.log('Setting up wardrobe with:', { wardrobeId, isSpecificWardrobe });
+    
+    if (isSpecificWardrobe && wardrobeId) {
+      const wardrobe = wardrobes.find(w => w.id === wardrobeId);
+      if (wardrobe) {
+        console.log('Found wardrobe:', wardrobe.name);
+        setCurrentWardrobe(wardrobe);
+      } else {
+        console.log('Wardrobe not found, navigating back');
+        router.back();
+      }
+    } else {
+      console.log('Setting up all clothes view');
+      clearCurrentWardrobe();
+    }
+
+    // Clean up when unmounting
+    return () => {
+      console.log('Cleaning up wardrobe screen');
+      clearCurrentWardrobe();
+    };
+  }, []);  // Empty deps array since this should only run once when mounted
+
+  return (
+    <SafeAreaView style={[styles.container, isDark && styles.containerDark]}>
+      <Stack.Screen options={{ headerShown: false }} />
+      <WardrobeContent isDark={isDark} />
+      <WardrobeModal
+        visible={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
+    </SafeAreaView>
+  );
+}
+
+// Content component that handles the actual display
+function WardrobeContent({ isDark }: { isDark: boolean }) {
   const {
     clothingItems,
     loading: itemsLoading,
@@ -29,6 +90,7 @@ export default function WardrobeScreen() {
     setActiveTab,
     totalItems,
     displayedCount,
+    refetch,
   } = useWardrobeContent();
 
   const {
@@ -37,54 +99,32 @@ export default function WardrobeScreen() {
     error: outfitsError,
   } = useOutfits();
 
-  // Set current wardrobe from params
-  useEffect(() => {
-    const isSpecificWardrobe = params.isSpecificWardrobe === 'true';
-    
-    if (isSpecificWardrobe && params.id) {
-      const wardrobe = wardrobes.find(w => w.id === Number(params.id));
-      if (wardrobe) {
-        setCurrentWardrobe(wardrobe);
-      }
-    } else {
-      // If we're in "Tous les vêtements" view or any other case, clear the current wardrobe
-      setCurrentWardrobe(null);
-    }
-
-    // Cleanup when screen unmounts
-    return () => {
-      setCurrentWardrobe(null); // Reset wardrobe when leaving screen
-    };
-  }, [params.id, params.isSpecificWardrobe, wardrobes]);
-
   const loading = itemsLoading || outfitsLoading;
   const error = itemsError || outfitsError;
 
+  const handleRetry = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
   if (loading) {
     return (
-      <SafeAreaView style={[styles.container, isDark && styles.containerDark]}>
-        <Stack.Screen options={{ headerShown: false }} />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={isDark ? 'white' : 'black'} />
-          <ThemedText style={styles.loadingText}>Chargement en cours...</ThemedText>
-        </View>
-      </SafeAreaView>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={isDark ? 'white' : 'black'} />
+        <ThemedText style={styles.loadingText}>Chargement en cours...</ThemedText>
+      </View>
     );
   }
 
   if (error) {
     return (
-      <SafeAreaView style={[styles.container, isDark && styles.containerDark]}>
-        <Stack.Screen options={{ headerShown: false }} />
-        <View style={styles.errorContainer}>
-          <ThemedText style={styles.errorText}>
-            {error instanceof Error ? error.message : error}
-          </ThemedText>
-          <Pressable style={styles.retryButton}>
-            <ThemedText style={styles.retryText}>Réessayer</ThemedText>
-          </Pressable>
-        </View>
-      </SafeAreaView>
+      <View style={styles.errorContainer}>
+        <ThemedText style={styles.errorText}>
+          {error instanceof Error ? error.message : error}
+        </ThemedText>
+        <Pressable style={styles.retryButton} onPress={handleRetry}>
+          <ThemedText style={styles.retryText}>Réessayer</ThemedText>
+        </Pressable>
+      </View>
     );
   }
 
@@ -97,9 +137,9 @@ export default function WardrobeScreen() {
               <View key={item.id} style={styles.gridItem}>
                 <ClothingCard
                   id={item.id}
-                  imageUrl={{ uri: item.imageUrl }}
-                  brand={item.name}
-                  date={new Date(item.createdAt).toLocaleDateString('fr-FR')}
+                  imageUrl={{ uri: item.imageUrl || '' }}
+                  brand={item.name || ''}
+                  date={new Date(item.createdAt || '').toLocaleDateString('fr-FR')}
                 />
               </View>
             ))}
@@ -135,9 +175,7 @@ export default function WardrobeScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, isDark && styles.containerDark]}>
-      <Stack.Screen options={{ headerShown: false }} />
-      
+    <>
       <Header onOptionsPress={() => {/* votre code */}} />
       <View style={styles.headerActions}>
         <TabSelector activeTab={activeTab} onTabChange={setActiveTab} />
@@ -146,12 +184,7 @@ export default function WardrobeScreen() {
       <ScrollView style={styles.content}>
         {renderContent()}
       </ScrollView>
-
-      <WardrobeModal
-        visible={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-      />
-    </SafeAreaView>
+    </>
   );
 }
 

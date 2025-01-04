@@ -13,6 +13,7 @@ interface WardrobeContextType {
   createClothingItem: (data: Partial<ClothingItem>) => Promise<ClothingItem>;
   updateClothingItem: (itemId: number, data: Partial<ClothingItem>) => Promise<ClothingItem>;
   deleteClothingItem: (itemId: number) => Promise<void>;
+  clearCurrentWardrobe: () => void;
 }
 
 const WardrobeContext = createContext<WardrobeContextType | undefined>(undefined);
@@ -23,29 +24,21 @@ export function WardrobeProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const refreshCurrentWardrobe = async () => {
-    if (currentWardrobe) {
-      const updatedWardrobe = await wardrobeService.getWardrobeById(currentWardrobe.id);
-      setCurrentWardrobe(updatedWardrobe);
-    }
+  const clearCurrentWardrobe = () => {
+    setCurrentWardrobe(null);
   };
 
   const refreshWardrobes = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const data = await wardrobeService.getAllWardrobes();
       setWardrobes(data);
       
-      // Update current wardrobe if it exists
+      // Only update current wardrobe if it exists and is in the new data
       if (currentWardrobe) {
         const updatedCurrentWardrobe = data.find(w => w.id === currentWardrobe.id);
-        if (updatedCurrentWardrobe) {
-          setCurrentWardrobe(updatedCurrentWardrobe);
-        } else {
-          setCurrentWardrobe(data[0] || null);
-        }
-      } else if (data.length > 0) {
-        setCurrentWardrobe(data[0]);
+        setCurrentWardrobe(updatedCurrentWardrobe || null);
       }
     } catch (err) {
       setError('Failed to load wardrobes');
@@ -57,8 +50,10 @@ export function WardrobeProvider({ children }: { children: React.ReactNode }) {
 
   const createNewWardrobe = async (data: Partial<Wardrobe>) => {
     try {
+      setError(null);
       const newWardrobe = await wardrobeService.createWardrobe(data);
-      setWardrobes([...wardrobes, newWardrobe]);
+      await refreshWardrobes();
+      setCurrentWardrobe(newWardrobe);
       return newWardrobe;
     } catch (err) {
       setError('Failed to create wardrobe');
@@ -152,6 +147,7 @@ export function WardrobeProvider({ children }: { children: React.ReactNode }) {
         createClothingItem,
         updateClothingItem,
         deleteClothingItem,
+        clearCurrentWardrobe,
       }}
     >
       {children}

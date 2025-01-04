@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ClothingItem } from '@/types/api.types';
 import { wardrobeService } from '@/services/wardrobe/wardrobeService';
 import { uploadImageToCloudinary } from '@/services/Cloudinary/CloudinaryServices';
+import { useWardrobe } from '@/contexts/WardrobeContext';
 
 export interface ClothingFormData extends Partial<ClothingItem> {
     imageBase64?: string;
@@ -11,6 +12,7 @@ export interface ClothingFormData extends Partial<ClothingItem> {
 }
 
 export function useClothingForm(initialData: Partial<ClothingItem>) {
+  const { currentWardrobe } = useWardrobe();
   const [formData, setFormData] = useState<ClothingFormData>({
     // Default values for new items
     name: '',
@@ -41,6 +43,11 @@ export function useClothingForm(initialData: Partial<ClothingItem>) {
   };
 
   const saveClothing = async () => {
+    if (!currentWardrobe) {
+      console.error('No wardrobe selected');
+      return false;
+    }
+
     try {
       setIsSaving(true);
       let itemToSave = { ...formData };
@@ -62,9 +69,9 @@ export function useClothingForm(initialData: Partial<ClothingItem>) {
 
       // Create or update the clothing item
       if (formData.id) {
-        await wardrobeService.updateClothingItem(formData.id, itemToSave);
+        await wardrobeService.updateClothingItem(currentWardrobe.id, formData.id, itemToSave);
       } else {
-        await wardrobeService.createClothingItem(itemToSave);
+        await wardrobeService.createClothingItem(currentWardrobe.id, itemToSave);
       }
       return true;
 

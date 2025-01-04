@@ -13,13 +13,20 @@ export const wardrobeService = {
   },
 
   createWardrobe: async (data: Partial<Wardrobe>) => {
-    const now = new Date().toISOString();
-    const wardrobeData = {
-      ...data,
-      createdAt: now,
-      updatedAt: now,
-    };
-    return await apiClientWrapper.post<Wardrobe>('/wardrobes', wardrobeData);
+    try {
+      const now = new Date().toISOString();
+      const wardrobeData = {
+        ...data,
+        createdAt: now,
+        updatedAt: now,
+      };
+      
+      // Create the wardrobe using the /me endpoint to automatically associate with current user
+      return await apiClientWrapper.post<Wardrobe>('/wardrobes/me', wardrobeData);
+    } catch (error) {
+      console.error('Error creating wardrobe:', error);
+      throw error;
+    }
   },
 
   updateWardrobe: async (id: number, data: Partial<Wardrobe>) => {
@@ -36,13 +43,20 @@ export const wardrobeService = {
 
   // Clothing Items Management
   getAllClothingItems: async () => {
-    // Use the /me endpoint which will use the authenticated user's token
-    return await apiClientWrapper.get<ClothingItem[]>('/users/me/clothing-items');
+    try {
+      console.log('Fetching all clothing items...');
+      // Use the /me endpoint which will use the authenticated user's token
+      const response = await apiClientWrapper.get<ClothingItem[]>('/users/me/clothing-items');
+      console.log('All clothing items response:', response);
+      return response || [];
+    } catch (error) {
+      console.error('Error fetching all clothing items:', error);
+      throw error;
+    }
   },
 
   getClothingItemById: async (wardrobeId: number, itemId: number) => {
-    console.log("logging info :")
-      console.log(wardrobeId, itemId);
+    console.log("Fetching clothing item:", wardrobeId, itemId);
     return await apiClientWrapper.get<ClothingItem>(
       `/wardrobes/${wardrobeId}/clothing-items/${itemId}`
     );
@@ -85,7 +99,15 @@ export const wardrobeService = {
   },
 
   getWardrobeOutfits: async (wardrobeId: number) => {
-      return await apiClientWrapper.get<Outfit[]>(`/wardrobes/${wardrobeId}/clothing-items`);
+    try {
+      console.log('Fetching outfits for wardrobe:', wardrobeId);
+      const response = await apiClientWrapper.get<Outfit[]>(`/wardrobes/${wardrobeId}/outfits`);
+      console.log('Wardrobe outfits response:', response);
+      return response || [];
+    } catch (error) {
+      console.error('Error fetching wardrobe outfits:', error);
+      throw error;
+    }
   },
 
   createOutfit: async (wardrobeId: number, data: Partial<Outfit>) => {
@@ -111,8 +133,16 @@ export const wardrobeService = {
     return await apiClientWrapper.delete(`/wardrobes/${wardrobeId}/outfits/${outfitId}`);
   },
 
-  // Backward compatibility
+  // Wardrobe Items
   getWardrobeItems: async (wardrobeId: number) => {
-    return await apiClientWrapper.get<ClothingItem[]>(`/wardrobes/${wardrobeId}/clothing-items`);
+    try {
+      console.log('Fetching items for wardrobe:', wardrobeId);
+      const response = await apiClientWrapper.get<ClothingItem[]>(`/wardrobes/${wardrobeId}/clothing-items`);
+      console.log('Wardrobe items response:', response);
+      return response || [];
+    } catch (error) {
+      console.error('Error fetching wardrobe items:', error);
+      throw error;
+    }
   },
 };

@@ -1,103 +1,96 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { wardrobeService } from '@/services/wardrobe/wardrobeService';
-import { ClothingItem } from '@/types/api.types';
+import { ClothingItem, Outfit } from '@/types/api.types';
 import { useWardrobe } from '@/contexts/WardrobeContext';
+import { useLocalSearchParams } from 'expo-router';
 
 type Tab = 'tous' | 'tops' | 'tenues';
 
 export function useWardrobeContent() {
   const [activeTab, setActiveTab] = useState<Tab>('tous');
-  const [showOptions, setShowOptions] = useState(false);
-  const [showFilterModal, setShowFilterModal] = useState(false);
   const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
+  const [outfits, setOutfits] = useState<Outfit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const { currentWardrobe } = useWardrobe();
 
-  const fetchClothingItems = async () => {
+  // Get the current view type from URL params
+  const params = useLocalSearchParams();
+  const isSpecificWardrobe = params.isSpecificWardrobe === 'true';
+  const wardrobeId = params.id ? Number(params.id) : null;
+
+  // Define loadData function
+  const loadData = useCallback(async () => {
     try {
-      let response;
-      if (currentWardrobe?.id) {
-        // Fetch items for specific wardrobe
-        response = await wardrobeService.getWardrobeItems(currentWardrobe.id);
-      } else {
-        // Fetch all items when no wardrobe is selected
-        response = await wardrobeService.getAllClothingItems();
-      }
-      setClothingItems(response || []);
+      setLoading(true);
       setError(null);
+
+      let items: ClothingItem[] = [];
+      let outfitsList: Outfit[] = [];
+
+      if (isSpecificWardrobe && wardrobeId) {
+        console.log('Loading specific wardrobe:', wardrobeId);
+        items = await wardrobeService.getWardrobeItems(wardrobeId);
+        outfitsList = await wardrobeService.getWardrobeOutfits(wardrobeId);
+      } else {
+        console.log('Loading all clothes');
+        items = await wardrobeService.getAllClothingItems();
+        outfitsList = await wardrobeService.getAllOutfits();
+      }
+
+      console.log('Setting data:', {
+        items: items.length,
+        outfits: outfitsList.length,
+        viewType: isSpecificWardrobe ? 'specific' : 'all'
+      });
+      setClothingItems(items);
+      setOutfits(outfitsList);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch clothing items'));
-      setClothingItems([]);
+      console.error('Error loading wardrobe content:', err);
+      setError(err instanceof Error ? err : new Error('Failed to load items'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [isSpecificWardrobe, wardrobeId]);
 
-  // Handle wardrobe changes and data fetching
+  // Load data when params change
   useEffect(() => {
-    let isMounted = true;
+    let mounted = true;
+    
+    async function fetchData() {
+      if (!mounted) return;
+      await loadData();
+    }
 
-    const loadData = async () => {
-      setLoading(true);
-      setClothingItems([]); // Clear old data immediately
-      
-      try {
-        let response;
-        if (currentWardrobe?.id) {
-          response = await wardrobeService.getWardrobeItems(currentWardrobe.id);
-        } else {
-          response = await wardrobeService.getAllClothingItems();
-        }
-        
-        if (isMounted) {
-          setClothingItems(response || []);
-          setError(null);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err instanceof Error ? err : new Error('Failed to fetch clothing items'));
-          setClothingItems([]);
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
+    fetchData();
 
-    loadData();
-
-    // Cleanup function
     return () => {
-      isMounted = false;
+      mounted = false;
     };
-  }, [currentWardrobe?.id]);
+  }, [loadData]);
 
   const displayedItems = useMemo(() => {
-    if (!clothingItems) return [];
-    
-    if (activeTab === 'tops') {
-      return clothingItems.filter(item => 
-        item.category?.toLowerCase() === 'tops'
-      );
+    switch (activeTab) {
+      case 'tops':
+        return clothingItems.filter(item => 
+          item.category?.toLowerCase() === 'tops'
+        );
+      case 'tenues':
+        return outfits;
+      default:
+        return clothingItems;
     }
-    return clothingItems;
-  }, [activeTab, clothingItems]);
+  }, [activeTab, clothingItems, outfits]);
 
   return {
     activeTab,
     setActiveTab,
-    showOptions,
-    setShowOptions,
-    showFilterModal,
-    setShowFilterModal,
     clothingItems: displayedItems,
+    outfitsData: outfits,
     showEmptyState: displayedItems.length === 0,
     totalItems: clothingItems.length,
     displayedCount: displayedItems.length,
     loading,
     error,
-    refetch: fetchClothingItems
+    refetch: loadData
   };
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Modal, 
@@ -20,7 +20,7 @@ interface WardrobeModalProps {
 export function WardrobeModal({ visible, onClose, initialData }: WardrobeModalProps) {
   const [name, setName] = useState(initialData?.name || '');
   const [isLoading, setIsLoading] = useState(false);
-  const { createNewWardrobe, refreshWardrobes } = useWardrobe();
+  const { createNewWardrobe } = useWardrobe();
 
   const handleSubmit = async () => {
     if (!name.trim()) return;
@@ -28,7 +28,6 @@ export function WardrobeModal({ visible, onClose, initialData }: WardrobeModalPr
     try {
       setIsLoading(true);
       await createNewWardrobe({ name });
-      await refreshWardrobes();
       setName('');
       onClose();
     } catch (error) {
@@ -37,6 +36,13 @@ export function WardrobeModal({ visible, onClose, initialData }: WardrobeModalPr
       setIsLoading(false);
     }
   };
+
+  // Reset name when modal is opened/closed
+  useEffect(() => {
+    if (visible) {
+      setName(initialData?.name || '');
+    }
+  }, [visible, initialData]);
 
   return (
     <Modal

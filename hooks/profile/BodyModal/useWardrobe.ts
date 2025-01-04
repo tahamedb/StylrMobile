@@ -33,7 +33,7 @@ export const useWardrobe = () => {
   };
 
   return {
-    wardrobeData: wardrobeData || [],
+    wardrobeData,
     wardrobes,
     selectedCategory,
     setSelectedCategory,

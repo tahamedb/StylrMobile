@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, Alert, RefreshControl } from 'react-native';
 import { Lock, AlertCircle, Shirt, Eye, Trash2 } from 'lucide-react-native';
 import { useWardrobe } from '@/hooks/profile/BodyModal/useWardrobe';
 import { useProfile } from '@/hooks/profile/HeaderModal/useProfile';
@@ -14,6 +14,7 @@ export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
   const router = useRouter();
   const { user } = useProfile(1);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const { 
     wardrobeData, 
     wardrobes = [], 
@@ -23,6 +24,15 @@ export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
     refetch 
   } = useWardrobe();
   const { refreshWardrobes } = useWardrobeContext();
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([refetch(), refreshWardrobes()]);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const totalItems = (wardrobeData || []).length;
   const previewItems = (wardrobeData || []).slice(0, 4);
@@ -50,7 +60,7 @@ export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
     );
   }
 
-  if (isLoading) {
+  if (isLoading && !refreshing) {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color="#000" />
@@ -146,7 +156,18 @@ export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView 
+      style={styles.container} 
+      contentContainerStyle={styles.scrollContent}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={["#000"]}
+          tintColor="#000"
+        />
+      }
+    >
       <View style={styles.grid}>
         {/* All Clothes Section */}
         {variant === 'private' && (
