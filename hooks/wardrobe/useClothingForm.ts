@@ -52,26 +52,33 @@ export function useClothingForm(initialData: Partial<ClothingItem>) {
       setIsSaving(true);
       let itemToSave = { ...formData };
 
-      // If we have a base64 image, upload it first
-      if (formData.imageUrl) {
+      // Always upload to Cloudinary first
+      if (itemToSave.imageUrl) {
         console.log('Uploading image to Cloudinary...');
-        const cloudinaryUrl = await uploadImageToCloudinary(
-          formData.imageUrl,
-          formData.removeBackground ? 'WeWear_nobg' : 'WeWear' // Use WeWear_nobg preset if removeBackground is true
-        );
-        itemToSave.imageUrl = cloudinaryUrl;
+        try {
+          const cloudinaryUrl = await uploadImageToCloudinary(
+            itemToSave.imageUrl,
+            itemToSave.removeBackground ? 'WeWear_nobg' : 'WeWear'
+          );
+          console.log('Cloudinary upload successful:', cloudinaryUrl);
+          itemToSave.imageUrl = cloudinaryUrl;
+        } catch (uploadError) {
+          console.error('Failed to upload image to Cloudinary:', uploadError);
+          return false;
+        }
       }
 
       // Remove the removeBackground field before saving to backend
       delete itemToSave.removeBackground;
+      delete itemToSave.imageBase64;
 
-      console.log('Saving clothing item with data:', itemToSave);
+      console.log('Saving item with imageUrl:', itemToSave.imageUrl);
 
       // Create or update the clothing item
       if (formData.id) {
         await wardrobeService.updateClothingItem(currentWardrobe.id, formData.id, itemToSave);
       } else {
-        await wardrobeService.createClothingItem(currentWardrobe.id, itemToSave);
+        await wardrobeService.createClothingItem(currentWardrobe.id, itemToSave, itemToSave.imageUrl ?? '');
       }
       return true;
 

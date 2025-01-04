@@ -1,16 +1,17 @@
 import React from 'react';
-import { View, Pressable, ActivityIndicator } from 'react-native';
+import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { styles } from '../Style/HeaderDetailPage';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 interface HeaderDetailPageProps {
   isDark: boolean;
-  isNewItem?: boolean;
-  onSave?: () => void;
-  isSaving?: boolean;
-  removeBackground?: boolean;
-  onToggleBackground?: (value: boolean) => void;
+  isNewItem: boolean;
+  onSave: () => Promise<void>;
+  isSaving: boolean;
+  removeBackground: boolean;
+  onToggleBackground: (value: boolean) => void;
 }
 
 export function HeaderDetailPage({ 
@@ -18,67 +19,46 @@ export function HeaderDetailPage({
   isNewItem, 
   onSave, 
   isSaving,
-  removeBackground = false,
+  removeBackground,
   onToggleBackground
 }: HeaderDetailPageProps) {
+  const router = useRouter();
+
   return (
-    <View style={styles.header}>
-      <Pressable>
-        <MaterialCommunityIcons 
-          name="chevron-left"
-          size={24}
-          color={isDark ? 'white' : 'black'}
-        />
-      </Pressable>
-      
-      <ThemedText style={styles.title}>
-        {isNewItem ? 'Nouveau Vêtement' : 'Détails des Vêtements'}
-      </ThemedText>
-      
-      <View style={styles.headerRight}>
+    <View style={[styles.header, isDark && styles.headerDark]}>
+      <TouchableOpacity onPress={() => router.back()}>
+        <MaterialCommunityIcons name="close" size={24} color={isDark ? '#fff' : '#000'} />
+      </TouchableOpacity>
+
+      <View style={styles.headerActions}>
         {isNewItem && (
-          <>
-            <Pressable 
-              onPress={() => onToggleBackground?.(!removeBackground)}
-              style={[styles.iconButton, removeBackground && styles.iconButtonActive]}
-            >
-              <MaterialCommunityIcons 
-                name="image-off"
-                size={24}
-                color={removeBackground ? '#4CAF50' : (isDark ? 'white' : 'black')}
-              />
-            </Pressable>
-            <Pressable 
-              onPress={onSave}
-              disabled={isSaving}
-              style={styles.saveButton}
-            >
-              {isSaving ? (
-                <ActivityIndicator size="small" color={isDark ? 'white' : 'black'} />
-              ) : (
-                <MaterialCommunityIcons 
-                  name="content-save"
-                  size={24}
-                  color={isDark ? 'white' : 'black'}
-                />
-              )}
-            </Pressable>
-          </>
-        )}
-        {!isNewItem && (
-          <>
+          <TouchableOpacity 
+            style={[styles.backgroundToggle, removeBackground && styles.backgroundToggleActive]}
+            onPress={() => onToggleBackground(!removeBackground)}
+          >
             <MaterialCommunityIcons 
-              name="star-outline"
-              size={24}
-              color={isDark ? 'white' : 'black'}
+              name="image-off-outline" 
+              size={20} 
+              color={removeBackground ? '#fff' : '#666'} 
             />
-            <MaterialCommunityIcons 
-              name="dots-horizontal"
-              size={24}
-              color={isDark ? 'white' : 'black'}
-            />
-          </>
+          </TouchableOpacity>
         )}
+        
+        <TouchableOpacity 
+          style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+          onPress={onSave}
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <MaterialCommunityIcons 
+              name="content-save" 
+              size={24} 
+              color="#fff" 
+            />
+          )}
+        </TouchableOpacity>
       </View>
     </View>
   );

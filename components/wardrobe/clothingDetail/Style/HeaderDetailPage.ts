@@ -1,4 +1,5 @@
 import {StyleSheet } from 'react-native';
+
 export const styles = StyleSheet.create({
     header: {
       flexDirection: 'row',
@@ -7,33 +8,34 @@ export const styles = StyleSheet.create({
       paddingHorizontal: 16,
       paddingVertical: 12,
       backgroundColor: '#fff',
-      zIndex: 1,
-      position: 'relative',
+      borderBottomWidth: 1,
+      borderBottomColor: '#eee',
     },
-    headerRight: {
+    headerDark: {
+      backgroundColor: '#000',
+      borderBottomColor: '#333',
+    },
+    headerActions: {
       flexDirection: 'row',
-      gap: 16,
       alignItems: 'center',
+      gap: 12,
     },
-    title: {
-      fontSize: 18,
-      fontWeight: '600',
+    backgroundToggle: {
+      padding: 8,
+      borderRadius: 8,
+      backgroundColor: '#f5f5f5',
+    },
+    backgroundToggleActive: {
+      backgroundColor: '#666',
     },
     saveButton: {
+      backgroundColor: '#000',
       padding: 8,
+      borderRadius: 8,
       alignItems: 'center',
       justifyContent: 'center',
     },
     saveButtonDisabled: {
       opacity: 0.5,
-    },
-    iconButton: {
-      padding: 8,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderRadius: 8,
-    },
-    iconButtonActive: {
-      backgroundColor: 'rgba(76, 175, 80, 0.1)',
     },
   });

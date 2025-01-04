@@ -47,7 +47,6 @@ export function WardrobeList({ onEditWardrobe, onDeleteWardrobe }: WardrobeListP
 
   const handleWardrobePress = (wardrobe: Wardrobe) => {
     setCurrentWardrobe(wardrobe);
-    setSelectedWardrobe(wardrobe);
   };
 
   const renderWardrobe = ({ item }: { item: Wardrobe }) => {
@@ -71,7 +70,10 @@ export function WardrobeList({ onEditWardrobe, onDeleteWardrobe }: WardrobeListP
           )}
           {onEditWardrobe && (
             <TouchableOpacity 
-              onPress={() => onEditWardrobe(item)}
+              onPress={(e) => {
+                e.stopPropagation();
+                onEditWardrobe(item);
+              }}
               style={styles.actionButton}
             >
               <MaterialCommunityIcons name="pencil" size={20} color="#666" />
@@ -79,14 +81,20 @@ export function WardrobeList({ onEditWardrobe, onDeleteWardrobe }: WardrobeListP
           )}
           {onDeleteWardrobe && item.id !== currentWardrobe?.id && (
             <TouchableOpacity 
-              onPress={() => onDeleteWardrobe(item)}
+              onPress={(e) => {
+                e.stopPropagation();
+                onDeleteWardrobe(item);
+              }}
               style={styles.actionButton}
             >
               <MaterialCommunityIcons name="delete" size={20} color="#666" />
             </TouchableOpacity>
           )}
           <TouchableOpacity 
-            onPress={() => setSelectedWardrobe(item)}
+            onPress={(e) => {
+              e.stopPropagation();
+              setSelectedWardrobe(item);
+            }}
             style={styles.actionButton}
           >
             <MaterialCommunityIcons name="information" size={20} color="#666" />

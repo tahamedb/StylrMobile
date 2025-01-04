@@ -6,36 +6,50 @@ if (!CLOUDINARY_URL || !UPLOAD_PRESET) {
   throw new Error('Cloudinary configuration is missing. Please check your environment variables.');
 }
 
-export const uploadImageToCloudinary = async (imageBase64: string, preset?: string): Promise<string> => {
-  try {
-    console.log('Uploading image to Cloudinary:');
-    const timestamp = new Date().getTime();
-    
-    const data = {
-      file: `${imageBase64}`,
-      upload_preset: preset || UPLOAD_PRESET,
-      folder: "wewear_uploads",
-      filename_override: `image_${timestamp}`
-    };
+// Function to transform Cloudinary URLs for different use cases
+export const getOptimizedImageUrl = (url: string, type: 'thumbnail' | 'full' = 'thumbnail') => {
+  if (!url || !url.includes('cloudinary')) return url;
 
-    const response = await fetch(CLOUDINARY_URL, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
+  // Extract base URL and file path
+  const [baseUrl, version, transformations, folder, filename] = url.split('/').slice(-5);
+
+  // Define transformation parameters based on usage
+  const transformationParams = type === 'thumbnail' 
+    ? 'w_200,h_200,c_fill,q_auto:good,f_auto' // Thumbnail view
+    : 'w_800,q_auto:good,f_auto'; // Full view
+
+  // Construct new URL with optimized parameters
+  return `${baseUrl}/${version}/${transformationParams}/${folder}/${filename}`;
+};
+
+export const uploadImageToCloudinary = async (imageData: string, preset: string) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', imageData);
+    formData.append('upload_preset', preset);
+    
+    // Add transformation parameters for compression and resizing
+    formData.append('transformation', JSON.stringify({
+      quality: 'auto:good',
+      fetch_format: 'auto',
+      width: 800,
+      crop: 'limit'
+    }));
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: 'POST',
+        body: formData,
       }
-    });
+    );
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Cloudinary error:', errorData);
-      throw new Error(`Upload failed with status ${response.status}`);
+      throw new Error('Failed to upload image to Cloudinary');
     }
 
-    const result = await response.json();
-    console.log('Upload successful:', result);
-
-    return result.secure_url;
+    const data = await response.json();
+    return data.secure_url;
   } catch (error) {
     console.error('Error uploading to Cloudinary:', error);
     throw error;

@@ -106,10 +106,15 @@ export function ClothingDetailView({
   };
 
   const handleSave = async () => {
-    const success = await saveClothing();
-    if (success) {
-      router.back();
-    } else {
+    try {
+      const success = await saveClothing();
+      if (success) {
+        await onSave(formData);
+      } else {
+        alert('Failed to save clothing item');
+      }
+    } catch (error) {
+      console.error('Error saving clothing:', error);
       alert('Failed to save clothing item');
     }
   };
@@ -133,8 +138,8 @@ export function ClothingDetailView({
         isDark={isDark} 
         isNewItem={isNewItem}
         onSave={handleSave}
-        isSaving={isSubmitting}
-        removeBackground={formData.removeBackground}
+        isSaving={isSaving}
+        removeBackground={formData.removeBackground || false}
         onToggleBackground={handleToggleBackground}
       />
       

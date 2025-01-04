@@ -62,7 +62,7 @@ export const wardrobeService = {
     );
   },
 
-  createClothingItem: async (wardrobeId: number, data: Partial<ClothingItem>) => {
+  createClothingItem: async (wardrobeId: number, data: Partial<ClothingItem>, imageUrl: string) => {
     const now = new Date().toISOString();
     const itemData = {
       ...data,
@@ -70,6 +70,7 @@ export const wardrobeService = {
       createdAt: now,
       updatedAt: now,
     };
+    itemData.imageUrl = imageUrl;
     return await apiClientWrapper.post<ClothingItem>(
       `/wardrobes/${wardrobeId}/clothing-items`, 
       itemData
