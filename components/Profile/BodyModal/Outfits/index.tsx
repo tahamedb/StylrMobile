@@ -10,7 +10,7 @@ import { styles } from './styles';
 import { OutfitsProps, TabType } from '@/types/api.types';
 
 export const Outfits: React.FC<OutfitsProps> = ({ variant }) => {
-  const { user } = useProfile(1);
+  const user = { username: 'test' };
   const { outfitsData } = useOutfits();
   const [activeTab, setActiveTab] = useState<TabType>('Idées');
 

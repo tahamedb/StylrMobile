@@ -121,9 +121,9 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="create-outfit"
+        name="outfits"
         options={{
-          title: "Create Outfit",
+          title: "Outfits",
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="tshirt-crew" size={24} color={color} />

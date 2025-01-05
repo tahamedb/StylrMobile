@@ -1,9 +1,10 @@
 import React from 'react';
-import {View, Text, Switch, Button, StyleSheet, SafeAreaView} from 'react-native';
+import { View, Text, Switch, Button, StyleSheet, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import { useColorScheme } from 'react-native';
 import { useRouter } from 'expo-router';
 import { authService } from '@/services/auth/authService';
 import { useUser } from '@/contexts/UserContext';
+import { wardrobeService } from '@/services/wardrobe/wardrobeService';
 
 const SettingsScreen = () => {
     const colorScheme = useColorScheme();
@@ -40,6 +41,16 @@ const SettingsScreen = () => {
         console.log('change credentials');
     };
 
+    const handleInjectTestData = async () => {
+        try {
+            await wardrobeService.injectTestData();
+            Alert.alert('Success', 'Test data injected successfully');
+        } catch (error) {
+            console.error('Error injecting test data:', error);
+            Alert.alert('Error', 'Failed to inject test data');
+        }
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.container}>
@@ -66,6 +77,17 @@ const SettingsScreen = () => {
                 <View style={styles.settingItem}>
                     <Text style={styles.settingText}>Terms of Service</Text>
                     <Button title="View Terms of Service" onPress={viewTOS} />
+                </View>
+
+                {/* Development section for test data */}
+                <View style={styles.developmentSection}>
+                    <Text style={styles.sectionHeader}>Development</Text>
+                    <TouchableOpacity 
+                        style={styles.devButton}
+                        onPress={handleInjectTestData}
+                    >
+                        <Text style={styles.devButtonText}>Inject Test Data</Text>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.logoutButton}>
@@ -98,6 +120,31 @@ const styles = StyleSheet.create({
     },
     logoutButton: {
         marginTop: 30,
+    },
+    developmentSection: {
+        marginTop: 30,
+        padding: 16,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+    },
+    sectionHeader: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#374151',
+        marginBottom: 12,
+    },
+    devButton: {
+        backgroundColor: '#f3f4f6',
+        padding: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    devButtonText: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#374151',
     },
 });
 

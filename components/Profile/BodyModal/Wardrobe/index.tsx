@@ -12,7 +12,7 @@ import { useWardrobe as useWardrobeContext } from '@/contexts/WardrobeContext';
 
 export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
   const router = useRouter();
-  const { user } = useProfile(1);
+  const user = { username: 'test' , id: 1};
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [allClothingItems, setAllClothingItems] = useState<ClothingItem[]>([]);

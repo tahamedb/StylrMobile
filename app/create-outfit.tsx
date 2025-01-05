@@ -35,9 +35,12 @@ export default function CreateOutfitScreen() {
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
+    console.log('Saving outfit:', outfitItems);
+    console.log('Current wardrobe:', currentWardrobe);
+    console.log('isSaving:', isSaving);
     if (!currentWardrobe?.id || isSaving) return;
 
-    // Validate outfit
+    // Validate outfit composition
     const hasTop = outfitItems.top;
     const hasBottom = outfitItems.bottom;
     const hasDress = outfitItems.dress;
@@ -50,17 +53,23 @@ export default function CreateOutfitScreen() {
     try {
       setIsSaving(true);
       
-      // Create a list of clothing items for the outfit
-      const clothingIds = Object.values(outfitItems)
-        .filter((item): item is ClothingItem => !!item) // Remove undefined items
-        .map(item => ({ id: item.id || 0 })); // Extract IDs
-
       await wardrobeService.createOutfit(currentWardrobe.id, {
-        name: 'New Outfit', // We can add name input later
+        name: 'New Outfit',
         wardrobe: { id: currentWardrobe.id },
-        clothingItems: clothingIds,
+        top: outfitItems.top ? { id: outfitItems.top.id } : undefined,
+        bottom: outfitItems.bottom ? { id: outfitItems.bottom.id } : undefined,
+        dress: outfitItems.dress ? { id: outfitItems.dress.id } : undefined,
+        outerwear: outfitItems.outerwear ? { id: outfitItems.outerwear.id } : undefined,
+        shoes: outfitItems.shoes ? { id: outfitItems.shoes.id } : undefined,
+        accessories: outfitItems.accessories?.map(item => ({ id: item.id })) || [],
+        season: 'All',
+        occasion: 'Casual',
+        tags: [],
+        rating: 0,
+        timesWorn: 0
       });
 
+      alert('Outfit saved successfully!');
       router.back();
     } catch (error) {
       console.error('Error saving outfit:', error);
@@ -143,6 +152,7 @@ export default function CreateOutfitScreen() {
           category={selectedSlot}
           onSelect={handleSelectItem}
           onClose={() => setSelectedSlot(null)}
+          visible={true}
         />
       )}
     </View>

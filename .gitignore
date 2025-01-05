@@ -3,7 +3,7 @@
 # dependencies
 node_modules/
 Backend_in_styler/
-
+Backend_in_Styler/
 # Expo
 .expo/
 dist/

@@ -47,28 +47,62 @@ apiClient.interceptors.response.use(
 
 export const apiClientWrapper = {
     async get<T>(endpoint: string): Promise<T> {
-        const response = await apiClient.get<T>(endpoint);
-        return response.data;
+        try {
+            const response = await apiClient.get<T>(endpoint);
+            return response.data;
+        } catch (error: any) {
+            console.error('API GET Error:', {
+                endpoint,
+                error: error.response?.data || error.message
+            });
+            throw new Error(error.response?.data?.message || error.message);
+        }
     },
 
     async post<T>(endpoint: string, data: any): Promise<T> {
         try {
+            console.log('API POST Request:', {
+                endpoint,
+                data
+            });
             const response = await apiClient.post<T>(endpoint, data);
+            console.log('API POST Response:', response.data);
             return response.data;
-        } catch (error) {
-            console.error('API POST Error:', error);
-            throw error;
+        } catch (error: any) {
+            console.error('API POST Error:', {
+                endpoint,
+                data,
+                error: error.response?.data || error.message
+            });
+            throw new Error(error.response?.data?.message || error.message);
         }
     },
 
     async put<T>(endpoint: string, data: any): Promise<T> {
-        const response = await apiClient.put<T>(endpoint, data);
-        return response.data;
+        try {
+            const response = await apiClient.put<T>(endpoint, data);
+            return response.data;
+        } catch (error: any) {
+            console.error('API PUT Error:', {
+                endpoint,
+                data,
+                error: error.response?.data || error.message
+            });
+            throw new Error(error.response?.data?.message || error.message);
+        }
     },
 
     async delete<T>(endpoint: string): Promise<T> {
-        const response = await apiClient.delete<T>(endpoint);
-        return response.data;
+        try {
+            const response = await apiClient.delete<T>(endpoint);
+            return response.data;
+        } catch (error: any) {
+            console.error('API DELETE Error:', {
+                endpoint,
+                error: error.response?.data || error.message
+            });
+            throw new Error(error.response?.data?.message || error.message);
+        }
     },
 };
 

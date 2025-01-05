@@ -66,7 +66,8 @@ export default function ClothingDetailScreen() {
         {
           ...itemData,
           wardrobe: { id: currentWardrobe.id }
-        }
+        },
+        itemData.imageUrl || ''
       );
       
       // Navigate back or show success message

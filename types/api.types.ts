@@ -54,27 +54,20 @@ import { Occasion } from '../components/wardrobe/clothingDetail/Body/Information
 //!!ici ajouter champ brand  dans backend 
 
 export interface ClothingItem {
-    id?: number;
+    id: number;
     name: string;
     category: string;
-    color: string;
-    size: string;
-    material: string;
-    materials: string[];
-    season: string;
-    brand: string;
-    rating: number;
-    price: number;
-    purchaseDate: string;
-    purchaseLink: string;
     imageUrl: string;
     colors: string[];
-    occasion: Occasion | undefined;
+    patterns: string[];
+    season: string;
+    occasion: string;
+    size: string;
+    brand: string;
+    material: string;
+    wardrobe?: { id: number };
     createdAt: string;
     updatedAt: string;
-    wardrobe: {
-        id: number;
-    };
 }
 //Profile wardrobe Component
 export interface Wardrobe {
@@ -83,24 +76,31 @@ export interface Wardrobe {
     user: {
         id: number;
     };
-    createdAt: string;
-    updatedAt: string;
     clothingItems?: ClothingItem[];
     outfits?: Outfit[];
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface Outfit {
     id: number;
-    name?: string;
-    imageUrl?: string;
-    wardrobe: {
-        id: number;
-    };
+    name: string;
+    description?: string;
+    season: string;
+    occasion: string;
+    tags: string[];
+    wardrobe: { id: number };
+    top?: { id: number };
+    bottom?: { id: number };
+    dress?: { id: number };
+    outerwear?: { id: number };
+    shoes?: { id: number };
+    accessories?: { id: number }[];
+    rating: number;
+    timesWorn: number;
     createdAt: string;
     updatedAt: string;
-    clothingItems?: { id: number }[];
-    isDaily?: boolean;
-    isRecommended?: boolean;
+    imageUrl?: string;
 }
 
 //Profile Outfits Component 
@@ -114,7 +114,7 @@ export interface OutfitTabsProps {
 }
 
 export interface OutfitsProps {
-  variant: VariantType;
+  variant: 'private' | 'public';
 }
 
 // End Wordrobe part 

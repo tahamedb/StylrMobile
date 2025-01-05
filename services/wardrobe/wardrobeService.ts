@@ -99,6 +99,18 @@ export const wardrobeService = {
     return await apiClientWrapper.get<Outfit[]>('/wardrobes/outfits');
   },
 
+  getOutfitById: async (outfitId: number) => {
+    try {
+      console.log('Fetching outfit by ID:', outfitId);
+      const response = await apiClientWrapper.get<Outfit>(`/outfits/${outfitId}`);
+      console.log('Outfit response:', response);
+      return response;
+    } catch (error) {
+      console.error('Error fetching outfit:', error);
+      throw error;
+    }
+  },
+
   getWardrobeOutfits: async (wardrobeId: number) => {
     try {
       console.log('Fetching outfits for wardrobe:', wardrobeId);
@@ -112,14 +124,33 @@ export const wardrobeService = {
   },
 
   createOutfit: async (wardrobeId: number, data: Partial<Outfit>) => {
-    const now = new Date().toISOString();
-    const outfitData = {
-      ...data,
-      wardrobe: { id: wardrobeId },
-      createdAt: now,
-      updatedAt: now,
-    };
-    return await apiClientWrapper.post<Outfit>(`/wardrobes/${wardrobeId}/outfits`, outfitData);
+    try {
+        console.log('Creating outfit:', {
+            wardrobeId,
+            data
+        });
+
+        const now = new Date().toISOString();
+        const outfitData = {
+            ...data,
+            wardrobe: { id: wardrobeId },
+            createdAt: now,
+            updatedAt: now,
+            rating: data.rating || 0,
+            timesWorn: data.timesWorn || 0
+        };
+
+        const response = await apiClientWrapper.post<Outfit>(
+            `/wardrobes/${wardrobeId}/outfits`,
+            outfitData
+        );
+
+        console.log('Outfit created successfully:', response);
+        return response;
+    } catch (error) {
+        console.error('Error creating outfit:', error);
+        throw error;
+    }
   },
 
   updateOutfit: async (wardrobeId: number, outfitId: number, data: Partial<Outfit>) => {
@@ -155,5 +186,42 @@ export const wardrobeService = {
       console.error('Error fetching clothing item directly:', error);
       return null;
     }
+  },
+
+  async injectTestData(): Promise<void> {
+    interface TestDataResponse {
+        ok: boolean;
+        data?: {
+            message?: string;
+        };
+    }
+
+    const response = await apiClientWrapper.post<TestDataResponse>('/test-data/inject', {});
+    if (!response.ok) {
+        throw new Error(response.data?.message || 'Failed to inject test data');
+    }
+  },
+
+  getRecommendedOutfits: async (wardrobeId: number, season?: string, occasion?: string) => {
+    const params = new URLSearchParams();
+    if (season) params.append('season', season);
+    if (occasion) params.append('occasion', occasion);
+    return await apiClientWrapper.get<Outfit[]>(`/outfits/recommendations?${params.toString()}`);
+  },
+
+  getPopularOutfits: async (wardrobeId: number) => {
+    return await apiClientWrapper.get<Outfit[]>('/outfits/popular');
+  },
+
+  getSimilarOutfits: async (wardrobeId: number, outfitId: number) => {
+    return await apiClientWrapper.get<Outfit[]>(`/outfits/${outfitId}/similar`);
+  },
+
+  rateOutfit: async (wardrobeId: number, outfitId: number, rating: number) => {
+    return await apiClientWrapper.post<Outfit>(`/outfits/${outfitId}/rate?rating=${rating}`, {});
+  },
+
+  incrementOutfitWear: async (wardrobeId: number, outfitId: number) => {
+    return await apiClientWrapper.post<Outfit>(`/outfits/${outfitId}/wear`, {});
   },
 };
