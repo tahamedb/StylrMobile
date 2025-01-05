@@ -98,7 +98,9 @@ export interface Outfit {
     };
     createdAt: string;
     updatedAt: string;
-    // Add other outfit fields as needed
+    clothingItems?: { id: number }[];
+    isDaily?: boolean;
+    isRecommended?: boolean;
 }
 
 //Profile Outfits Component 
