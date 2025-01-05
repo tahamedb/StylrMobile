@@ -20,20 +20,32 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { useOutfits } from '@/hooks/profile/BodyModal/useOutfits';
-import { Outfit } from '@/types/api.types';
+import { Outfit, ClothingItem } from '@/types/api.types';
 import { Stack } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { useWardrobe } from '@/contexts/WardrobeContext';
 import { ItemSelectionModal } from '@/components/wardrobe/ItemSelectionModal';
-import { ClothingItem } from '@/types/api.types';
-import { Picker } from '@react-native-picker/picker';
 import { OutfitSlot, SLOT_CONFIG, OutfitSelection } from '@/types/outfit.types';
 import { wardrobeService } from '@/services/wardrobe/wardrobeService';
+import { Picker } from '@react-native-picker/picker';
+
 const { width } = Dimensions.get('window');
 const ITEM_WIDTH = (width - 48) / 2;
 
 const SEASONS = ['All', 'Spring', 'Summer', 'Fall', 'Winter'];
 const OCCASIONS = ['All', 'Casual', 'Formal', 'Business', 'Sport', 'Party'];
+
+const TABS = ['All', 'Recommended'] as const;
+type TabType = typeof TABS[number];
+
+// Define the RecommendedOutfit type that extends Outfit
+interface RecommendedOutfit extends Outfit {
+  items?: Array<{
+    id: number;
+    category: string;
+    name: string;
+  }>;
+}
 
 export default function OutfitsScreen() {
   const router = useRouter();
@@ -58,9 +70,10 @@ export default function OutfitsScreen() {
   const [tempCreateWardrobe, setTempCreateWardrobe] = useState<number | null>(null);
   const [isViewPickerVisible, setIsViewPickerVisible] = useState(false);
   const [tempViewWardrobe, setTempViewWardrobe] = useState<number | null>(null);
-  const [recommendedOutfits, setRecommendedOutfits] = useState<Outfit[]>([]);
+  const [recommendedOutfits, setRecommendedOutfits] = useState<RecommendedOutfit[]>([]);
   const [popularOutfits, setPopularOutfits] = useState<Outfit[]>([]);
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>('All');
 
   useEffect(() => {
     Animated.spring(slideUpAnim, {
@@ -312,15 +325,14 @@ export default function OutfitsScreen() {
             selectedValue={currentWardrobe?.id}
             onValueChange={(itemValue) => handleViewWardrobeChange(Number(itemValue))}
             style={styles.picker}
-            dropdownIconColor="#fff"
-            itemStyle={{ color: '#fff' }}
+            dropdownIconColor="#11181C"
           >
             {wardrobes.map(wardrobe => (
               <Picker.Item 
                 key={wardrobe.id} 
                 label={wardrobe.name} 
                 value={wardrobe.id}
-                color="#fff"
+                color="#11181C"
               />
             ))}
           </Picker>
@@ -337,7 +349,7 @@ export default function OutfitsScreen() {
           <Text style={styles.androidPickerText}>
             {currentWardrobe?.name || 'Select Wardrobe'}
           </Text>
-          <Ionicons name="chevron-down" size={24} color="#fff" />
+          <Ionicons name="chevron-down" size={24} color="#11181C" />
         </TouchableOpacity>
 
         <Modal
@@ -347,27 +359,23 @@ export default function OutfitsScreen() {
           onRequestClose={closeViewPicker}
         >
           <TouchableOpacity 
-            style={[styles.modalOverlay, { justifyContent: 'flex-end' }]} 
+            style={styles.modalOverlay}
             activeOpacity={1} 
             onPress={closeViewPicker}
           >
             <TouchableOpacity 
               activeOpacity={1} 
-              style={[styles.modalContent, { width: '100%' }]}
+              style={styles.modalContent}
               onPress={e => e.stopPropagation()}
             >
-              <View style={[styles.modalHeader, { padding: 16 }]}>
-                <Text style={[styles.modalTitle, { fontSize: 18 }]}>Select Wardrobe</Text>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Select Wardrobe</Text>
                 <TouchableOpacity 
-                  style={[styles.modalCloseButton, { 
-                    padding: 8,
-                    borderRadius: 20,
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                  }]}
+                  style={styles.modalCloseButton}
                   onPress={closeViewPicker}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <Ionicons name="close" size={24} color="#fff" />
+                  <Ionicons name="close" size={24} color="#11181C" />
                 </TouchableOpacity>
               </View>
               <ScrollView style={styles.modalScroll}>
@@ -771,13 +779,138 @@ export default function OutfitsScreen() {
     );
   };
 
+  // Add this effect to load recommendations when tab changes
+  useEffect(() => {
+    if (activeTab === 'Recommended' && currentWardrobe?.id) {
+      loadRecommendations();
+    }
+  }, [activeTab, currentWardrobe?.id]);
+
+  const loadRecommendations = async () => {
+    if (!currentWardrobe?.id) return;
+    
+    setIsLoadingRecommendations(true);
+    try {
+      // Generate fake recommendations based on the wardrobe's items
+      const fakeRecommendations: RecommendedOutfit[] = [
+        {
+          id: 1001,
+          name: 'Casual Summer Day',
+          description: 'Perfect for a sunny day out',
+          season: 'Summer',
+          occasion: 'Casual',
+          imageUrl: undefined,
+          rating: 4.5,
+          timesWorn: 0,
+          tags: [],
+          wardrobe: { id: currentWardrobe.id },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          items: [
+            { id: 1, category: 'top', name: 'White Cotton T-Shirt' },
+            { id: 2, category: 'bottom', name: 'Light Blue Jeans' },
+            { id: 3, category: 'shoes', name: 'White Sneakers' }
+          ]
+        },
+        {
+          id: 1002,
+          name: 'Business Meeting',
+          description: 'Professional and polished look',
+          season: selectedSeason === 'All' ? 'Spring' : selectedSeason,
+          occasion: 'Business',
+          imageUrl: undefined,
+          rating: 4.8,
+          timesWorn: 0,
+          tags: [],
+          wardrobe: { id: currentWardrobe.id },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          items: [
+            { id: 4, category: 'top', name: 'Navy Blazer' },
+            { id: 5, category: 'bottom', name: 'Gray Dress Pants' },
+            { id: 6, category: 'shoes', name: 'Black Oxford Shoes' }
+          ]
+        },
+        {
+          id: 1003,
+          name: 'Weekend Brunch',
+          description: 'Stylish and comfortable',
+          season: selectedSeason === 'All' ? 'Fall' : selectedSeason,
+          occasion: 'Casual',
+          imageUrl: undefined,
+          rating: 4.2,
+          timesWorn: 0,
+          tags: [],
+          wardrobe: { id: currentWardrobe.id },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          items: [
+            { id: 7, category: 'top', name: 'Striped Sweater' },
+            { id: 8, category: 'bottom', name: 'Black Jeans' },
+            { id: 9, category: 'shoes', name: 'Leather Boots' }
+          ]
+        }
+      ];
+
+      setRecommendedOutfits(fakeRecommendations);
+    } catch (error) {
+      console.error('Error loading recommendations:', error);
+    } finally {
+      setIsLoadingRecommendations(false);
+    }
+  };
+
+  const renderRecommendedOutfitCard = (outfit: RecommendedOutfit) => (
+    <TouchableOpacity
+      key={outfit.id}
+      style={styles.outfitCard}
+      onPress={() => handleOutfitPress(outfit)}
+    >
+      <View style={styles.cardImageContainer}>
+        <View style={styles.recommendedPlaceholder}>
+          {outfit.items?.map((item) => (
+            <Text key={item.id} style={styles.recommendedItemText}>
+              • {item.name}
+            </Text>
+          ))}
+        </View>
+        <BlurView intensity={80} style={styles.cardOverlay}>
+          <Text style={styles.cardTitle} numberOfLines={1}>
+            {outfit.name}
+          </Text>
+          <Text style={styles.cardSubtitle}>
+            {outfit.occasion} • {outfit.season}
+          </Text>
+        </BlurView>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderTabs = () => (
+    <View style={styles.tabsContainer}>
+      {TABS.map((tab) => (
+        <TouchableOpacity
+          key={tab}
+          style={[
+            styles.tab,
+            activeTab === tab && styles.tabSelected
+          ]}
+          onPress={() => setActiveTab(tab)}
+        >
+          <Text style={[
+            styles.tabText,
+            activeTab === tab && styles.tabTextSelected
+          ]}>
+            {tab}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+
   if (error) {
     return (
       <View style={styles.container}>
-        <LinearGradient
-          colors={['#1a1a1a', '#2d2d2d']}
-          style={StyleSheet.absoluteFill}
-        />
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle-outline" size={48} color="#ff3b30" />
           <Text style={styles.errorText}>Failed to load outfits</Text>
@@ -797,17 +930,13 @@ export default function OutfitsScreen() {
         }}
       />
       
-      <LinearGradient
-        colors={['#1a1a1a', '#2d2d2d']}
-        style={StyleSheet.absoluteFill}
-      />
-      
       {renderMainHeader()}
+      {renderTabs()}
       {renderFilterChips()}
 
       {isLoading || refreshing ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#fff" />
+          <ActivityIndicator size="large" color="#0a7ea4" />
           <Text style={styles.loadingText}>Loading outfits...</Text>
         </View>
       ) : (
@@ -818,27 +947,32 @@ export default function OutfitsScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={handleRefresh}
-              tintColor="#fff"
+              tintColor="#0a7ea4"
             />
           }
         >
-          {renderRecommendations()}
-          {filteredOutfits.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="shirt-outline" size={48} color="#666" />
-              <Text style={styles.emptyText}>No outfits found</Text>
-              <TouchableOpacity
-                style={styles.createFirstButton}
-                onPress={handleCreatePress}
-              >
-                <Text style={styles.createFirstButtonText}>
-                  Create your first outfit
+          {activeTab === 'Recommended' ? (
+            isLoadingRecommendations ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color="#0a7ea4" />
+                <Text style={styles.loadingText}>Generating recommendations...</Text>
+              </View>
+            ) : recommendedOutfits.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Ionicons name="shirt-outline" size={48} color="#687076" />
+                <Text style={styles.emptyText}>No recommendations available</Text>
+                <Text style={styles.emptySubtext}>
+                  Add more items to your wardrobe to get personalized recommendations
                 </Text>
-              </TouchableOpacity>
-            </View>
+              </View>
+            ) : (
+              <View style={styles.grid}>
+                {recommendedOutfits.map(outfit => renderRecommendedOutfitCard(outfit))}
+              </View>
+            )
           ) : (
             <View style={styles.grid}>
-              {filteredOutfits.map(renderOutfitCard)}
+              {filteredOutfits.map(outfit => renderOutfitCard(outfit))}
             </View>
           )}
         </ScrollView>
@@ -848,12 +982,9 @@ export default function OutfitsScreen() {
         style={styles.fab}
         onPress={handleCreatePress}
       >
-        <LinearGradient
-          colors={['#fff', '#f0f0f0']}
-          style={styles.fabGradient}
-        >
-          <Ionicons name="add" size={24} color="#000" />
-        </LinearGradient>
+        <View style={styles.fabGradient}>
+          <Ionicons name="add" size={24} color="#fff" />
+        </View>
       </TouchableOpacity>
 
       {renderCreatePanel()}
@@ -873,21 +1004,24 @@ export default function OutfitsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#fff',
   },
-  header: {
+  mainHeader: {
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'ios' ? 60 : 20,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
     paddingBottom: 16,
+    backgroundColor: '#fff',
   },
   title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#fff',
+    fontSize: 28,
+    fontWeight: '600',
+    color: '#11181C',
+    marginBottom: 16,
   },
   filtersContainer: {
     paddingHorizontal: 16,
     marginBottom: 16,
+    backgroundColor: '#fff',
   },
   occasionFilters: {
     marginTop: 8,
@@ -896,39 +1030,44 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F1F3F5',
     marginRight: 8,
   },
   filterChipSelected: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0a7ea4',
   },
   filterChipText: {
-    color: '#fff',
+    color: '#687076',
     fontSize: 14,
+    fontWeight: '500',
   },
   filterChipTextSelected: {
+    color: '#fff',
     fontWeight: '600',
   },
   scrollView: {
     flex: 1,
+    backgroundColor: '#fff',
   },
   scrollContent: {
     padding: 16,
+    paddingBottom: 100,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
+    gap: 12,
   },
   outfitCard: {
     width: ITEM_WIDTH,
     aspectRatio: 1,
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: 'hidden',
+    backgroundColor: '#F1F3F5',
   },
   cardImageContainer: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F1F3F5',
   },
   cardImage: {
     width: '100%',
@@ -938,7 +1077,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: '#F1F3F5',
   },
   cardOverlay: {
     position: 'absolute',
@@ -946,27 +1085,28 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#fff',
+    color: '#11181C',
     marginBottom: 4,
   },
   cardSubtitle: {
     fontSize: 12,
-    color: '#fff',
-    opacity: 0.8,
+    color: '#687076',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#fff',
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#fff',
+    color: '#11181C',
     fontWeight: '600',
   },
   errorContainer: {
@@ -974,18 +1114,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
+    backgroundColor: '#fff',
   },
   errorText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#fff',
+    color: '#11181C',
     textAlign: 'center',
   },
   retryButton: {
     marginTop: 16,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0a7ea4',
     borderRadius: 25,
   },
   retryButtonText: {
@@ -999,18 +1140,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     minHeight: 300,
+    backgroundColor: '#fff',
   },
   emptyText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#fff',
+    color: '#11181C',
     textAlign: 'center',
   },
   createFirstButton: {
     marginTop: 16,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0a7ea4',
     borderRadius: 25,
   },
   createFirstButtonText: {
@@ -1026,16 +1168,17 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 28,
     overflow: 'hidden',
-    elevation: 5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
   fabGradient: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#0a7ea4',
   },
   createPanel: {
     position: 'absolute',
@@ -1151,15 +1294,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   pickerWrapper: {
-    backgroundColor: 'transparent',
+    backgroundColor: '#F1F3F5',
     borderRadius: 12,
     marginTop: 8,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   picker: {
-    color: '#fff',
+    color: '#11181C',
     ...(Platform.OS === 'ios' ? {
       height: 150,
     } : {
@@ -1167,46 +1308,17 @@ const styles = StyleSheet.create({
       width: '100%',
       height: 50,
     }),
-  } as const,
-  pickerItem: {
-    color: Platform.OS === 'ios' ? '#000' : '#fff',
-  },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    marginRight: 8,
-  },
-  chipSelected: {
-    backgroundColor: '#fff',
-  },
-  chipText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-  chipTextSelected: {
-    color: '#000',
-    fontWeight: '600',
-  },
-  mainHeader: {
-    paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
-    paddingBottom: 16,
-    marginTop: Platform.OS === 'ios' ? 20 : 30,
   },
   androidPickerButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F1F3F5',
     borderRadius: 12,
     padding: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   androidPickerText: {
-    color: '#fff',
+    color: '#11181C',
     fontSize: 16,
   },
   modalOverlay: {
@@ -1215,7 +1327,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '80%',
@@ -1227,17 +1339,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    borderBottomColor: '#F1F3F5',
   },
   modalTitle: {
-    color: '#fff',
+    color: '#11181C',
     fontSize: 18,
     fontWeight: '600',
   },
   modalCloseButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F1F3F5',
   },
   modalScroll: {
     padding: 16,
@@ -1246,16 +1358,17 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     marginBottom: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F1F3F5',
   },
   wardrobeOptionSelected: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0a7ea4',
   },
   wardrobeOptionText: {
-    color: '#fff',
+    color: '#11181C',
     fontSize: 16,
   },
   wardrobeOptionTextSelected: {
+    color: '#fff',
     fontWeight: '600',
   },
   recommendationSection: {
@@ -1311,5 +1424,66 @@ const styles = StyleSheet.create({
     height: 200,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginRight: 8,
+  },
+  chipSelected: {
+    backgroundColor: '#fff',
+  },
+  chipText: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  chipTextSelected: {
+    color: '#000',
+    fontWeight: '600',
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    backgroundColor: '#fff',
+  },
+  tab: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginRight: 8,
+    backgroundColor: '#F1F3F5',
+  },
+  tabSelected: {
+    backgroundColor: '#0a7ea4',
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#687076',
+  },
+  tabTextSelected: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  emptySubtext: {
+    marginTop: 8,
+    fontSize: 14,
+    color: '#687076',
+    textAlign: 'center',
+    paddingHorizontal: 32,
+  },
+  recommendedPlaceholder: {
+    flex: 1,
+    padding: 12,
+    justifyContent: 'center',
+    backgroundColor: '#F1F3F5',
+  },
+  recommendedItemText: {
+    fontSize: 14,
+    color: '#11181C',
+    marginBottom: 4,
   },
 }); 

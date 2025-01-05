@@ -10,8 +10,7 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { useOutfits } from '@/hooks/profile/BodyModal/useOutfits';
@@ -89,65 +88,41 @@ export default function OutfitDetailScreen() {
   const renderClothingItem = (item: ClothingItem | { id: number } | undefined) => {
     if (!item) return null;
 
-    if (!('name' in item)) {
-      return (
-        <View style={styles.clothingItem}>
-          <View style={styles.placeholderImage}>
-            <Ionicons name="shirt-outline" size={32} color="#666" />
-          </View>
-          <BlurView intensity={80} style={styles.itemOverlay}>
-            <Text style={styles.itemName} numberOfLines={1}>
-              Loading...
-            </Text>
-          </BlurView>
-        </View>
-      );
-    }
+    const clothingItem = item as ClothingItem;
+    if (!clothingItem.name) return null;
 
     return (
-      <View style={styles.clothingItem}>
-        <Image
-          source={{ uri: item.imageUrl }}
-          style={styles.clothingImage}
-          resizeMode="cover"
-        />
-        <BlurView intensity={80} style={styles.itemOverlay}>
-          <Text style={styles.itemName} numberOfLines={1}>
-            {item.name}
-          </Text>
-          <Text style={styles.itemCategory} numberOfLines={1}>
-            {item.category}
-          </Text>
-        </BlurView>
+      <View style={styles.itemCard}>
+        {clothingItem.imageUrl ? (
+          <Image
+            source={{ uri: clothingItem.imageUrl }}
+            style={styles.itemImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={styles.itemPlaceholder}>
+            <Ionicons name="shirt-outline" size={24} color="#687076" />
+          </View>
+        )}
+        <View style={styles.itemInfo}>
+          <Text style={styles.itemName}>{clothingItem.name}</Text>
+          <Text style={styles.itemCategory}>{clothingItem.category}</Text>
+        </View>
       </View>
     );
   };
 
-  if (isLoading) {
+  if (error) {
     return (
       <View style={styles.container}>
-        <LinearGradient
-          colors={['#1a1a1a', '#2d2d2d']}
-          style={StyleSheet.absoluteFill}
-        />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4CAF50" />
-          <Text style={styles.loadingText}>Loading outfit...</Text>
-        </View>
-      </View>
-    );
-  }
-
-  if (error || !outfit) {
-    return (
-      <View style={styles.container}>
-        <LinearGradient
-          colors={['#1a1a1a', '#2d2d2d']}
-          style={StyleSheet.absoluteFill}
+        <Stack.Screen 
+          options={{
+            headerShown: false
+          }}
         />
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle-outline" size={48} color="#ff3b30" />
-          <Text style={styles.errorText}>{error || 'Outfit not found'}</Text>
+          <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={loadOutfit}>
             <Text style={styles.retryButtonText}>Retry</Text>
           </TouchableOpacity>
@@ -156,101 +131,92 @@ export default function OutfitDetailScreen() {
     );
   }
 
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Stack.Screen 
+          options={{
+            headerShown: false
+          }}
+        />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0a7ea4" />
+          <Text style={styles.loadingText}>Loading outfit details...</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#1a1a1a', '#2d2d2d']}
-        style={StyleSheet.absoluteFill}
+      <Stack.Screen 
+        options={{
+          headerShown: false
+        }}
       />
       
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <Ionicons name="chevron-back" size={24} color="#11181C" />
           </TouchableOpacity>
           <View style={styles.headerActions}>
             <TouchableOpacity
-              style={styles.editButton}
+              style={styles.actionButton}
               onPress={handleEdit}
             >
-              <Ionicons name="pencil" size={20} color="#fff" />
+              <Ionicons name="pencil" size={20} color="#11181C" />
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.deleteButton, isDeleting && styles.deleteButtonDisabled]}
+              style={[styles.actionButton, styles.deleteButton]}
               onPress={handleDelete}
               disabled={isDeleting}
             >
-              <Ionicons name="trash" size={20} color="#fff" />
+              {isDeleting ? (
+                <ActivityIndicator size="small" color="#ff3b30" />
+              ) : (
+                <Ionicons name="trash-outline" size={20} color="#ff3b30" />
+              )}
             </TouchableOpacity>
           </View>
         </View>
 
-        <View style={styles.content}>
-          <Text style={styles.title}>{outfit?.name}</Text>
-          {outfit.description && (
-            <Text style={styles.description}>{outfit.description}</Text>
+        <View style={styles.outfitInfo}>
+          <Text style={styles.outfitName}>{outfit?.name}</Text>
+          {outfit?.description && (
+            <Text style={styles.outfitDescription}>{outfit.description}</Text>
           )}
-
-          <View style={styles.infoSection}>
-            <View style={styles.infoRow}>
-              <View style={styles.infoItem}>
-                <Text style={styles.infoLabel}>Season</Text>
-                <Text style={styles.infoValue}>{outfit.season}</Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Text style={styles.infoLabel}>Occasion</Text>
-                <Text style={styles.infoValue}>{outfit.occasion}</Text>
-              </View>
+          <View style={styles.tags}>
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>{outfit?.season}</Text>
             </View>
-            <View style={styles.infoRow}>
-              <View style={styles.infoItem}>
-                <Text style={styles.infoLabel}>Times Worn</Text>
-                <Text style={styles.infoValue}>{outfit.timesWorn}</Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Text style={styles.infoLabel}>Rating</Text>
-                <Text style={styles.infoValue}>{outfit.rating}/5</Text>
-              </View>
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>{outfit?.occasion}</Text>
             </View>
           </View>
+        </View>
 
-          <Text style={styles.sectionTitle}>Items</Text>
-          <View style={styles.itemsGrid}>
-            {outfit.top && renderClothingItem(outfit.top)}
-            {outfit.bottom && renderClothingItem(outfit.bottom)}
-            {outfit.dress && renderClothingItem(outfit.dress)}
-            {outfit.outerwear && renderClothingItem(outfit.outerwear)}
-            {outfit.shoes && renderClothingItem(outfit.shoes)}
+        <View style={styles.itemsContainer}>
+          {renderClothingItem(outfit?.top)}
+          {renderClothingItem(outfit?.bottom)}
+          {renderClothingItem(outfit?.dress)}
+          {renderClothingItem(outfit?.outerwear)}
+          {renderClothingItem(outfit?.shoes)}
+        </View>
+
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{outfit?.rating?.toFixed(1) || '0.0'}</Text>
+            <Text style={styles.statLabel}>Rating</Text>
           </View>
-
-          {outfit.accessories && outfit.accessories.length > 0 && (
-            <>
-              <Text style={styles.sectionTitle}>Accessories</Text>
-              <View style={styles.itemsGrid}>
-                {outfit.accessories.map((accessory, index) => (
-                  <React.Fragment key={accessory.id}>
-                    {renderClothingItem(accessory)}
-                  </React.Fragment>
-                ))}
-              </View>
-            </>
-          )}
-
-          {outfit.tags && outfit.tags.length > 0 && (
-            <View style={styles.tagsContainer}>
-              <Text style={styles.sectionTitle}>Tags</Text>
-              <View style={styles.tagsList}>
-                {outfit.tags.map((tag, index) => (
-                  <View key={index} style={styles.tag}>
-                    <Text style={styles.tagText}>{tag}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          )}
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{outfit?.timesWorn || 0}</Text>
+            <Text style={styles.statLabel}>Times Worn</Text>
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -260,150 +226,128 @@ export default function OutfitDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#fff',
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    padding: 16,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'ios' ? 60 : 20,
-    paddingBottom: 20,
+    marginTop: Platform.OS === 'ios' ? 40 : 20,
+    marginBottom: 16,
   },
   backButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F1F3F5',
   },
   headerActions: {
     flexDirection: 'row',
     gap: 12,
   },
-  editButton: {
+  actionButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F1F3F5',
   },
   deleteButton: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+    backgroundColor: '#FFE5E5',
   },
-  deleteButtonDisabled: {
-    opacity: 0.5,
+  outfitInfo: {
+    marginBottom: 24,
   },
-  content: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#fff',
+  outfitName: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#11181C',
     marginBottom: 8,
   },
-  description: {
+  outfitDescription: {
     fontSize: 16,
-    color: '#fff',
-    opacity: 0.8,
-    marginBottom: 24,
-  },
-  infoSection: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    color: '#687076',
     marginBottom: 16,
   },
-  infoItem: {
-    flex: 1,
-  },
-  infoLabel: {
-    fontSize: 14,
-    color: '#fff',
-    opacity: 0.6,
-    marginBottom: 4,
-  },
-  infoValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 16,
-  },
-  itemsGrid: {
+  tags: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-    marginBottom: 24,
-  },
-  clothingItem: {
-    width: '47%',
-    aspectRatio: 1,
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  clothingImage: {
-    width: '100%',
-    height: '100%',
-  },
-  itemOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 12,
-  },
-  itemName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  itemCategory: {
-    fontSize: 12,
-    color: '#fff',
-    opacity: 0.8,
-  },
-  tagsContainer: {
-    marginBottom: 24,
-  },
-  tagsList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 8,
   },
   tag: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F1F3F5',
     borderRadius: 16,
   },
   tagText: {
     fontSize: 14,
-    color: '#fff',
+    color: '#687076',
   },
-  loadingContainer: {
-    flex: 1,
+  itemsContainer: {
+    gap: 16,
+    marginBottom: 24,
+  },
+  itemCard: {
+    flexDirection: 'row',
+    backgroundColor: '#F1F3F5',
+    borderRadius: 12,
+    overflow: 'hidden',
+    height: 100,
+  },
+  itemImage: {
+    width: 100,
+    height: '100%',
+  },
+  itemPlaceholder: {
+    width: 100,
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#F1F3F5',
   },
-  loadingText: {
-    marginTop: 12,
+  itemInfo: {
+    flex: 1,
+    padding: 12,
+    justifyContent: 'center',
+  },
+  itemName: {
     fontSize: 16,
-    color: '#fff',
+    fontWeight: '500',
+    color: '#11181C',
+    marginBottom: 4,
+  },
+  itemCategory: {
+    fontSize: 14,
+    color: '#687076',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#F1F3F5',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 24,
     fontWeight: '600',
+    color: '#11181C',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#687076',
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: '#E6E8EB',
+    marginHorizontal: 16,
   },
   errorContainer: {
     flex: 1,
@@ -414,14 +358,14 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#fff',
+    color: '#11181C',
     textAlign: 'center',
   },
   retryButton: {
     marginTop: 16,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#0a7ea4',
     borderRadius: 25,
   },
   retryButtonText: {
@@ -429,10 +373,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  placeholderImage: {
+  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#11181C',
+    fontWeight: '500',
   },
 }); 

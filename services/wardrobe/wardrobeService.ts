@@ -2,6 +2,84 @@ import { apiClientWrapper } from '../api/client';
 import { Wardrobe, ClothingItem, Outfit } from '@/types/api.types';
 import { authService } from '../auth/authService';
 
+// Color harmony rules
+const COLOR_COMBINATIONS = {
+  red: {
+    matching: ['white', 'black', 'navy', 'gray', 'beige'],
+    confidence: 85,
+    reason: 'Classic color combination that creates a bold and sophisticated look'
+  },
+  blue: {
+    matching: ['white', 'gray', 'beige', 'brown', 'navy'],
+    confidence: 90,
+    reason: 'Timeless combination that works well for any occasion'
+  },
+  black: {
+    matching: ['white', 'gray', 'red', 'beige', 'any'],
+    confidence: 95,
+    reason: 'Versatile neutral that pairs well with most colors'
+  },
+  white: {
+    matching: ['any'],
+    confidence: 90,
+    reason: 'Clean and versatile base that complements any color'
+  },
+  green: {
+    matching: ['white', 'beige', 'brown', 'gray', 'navy'],
+    confidence: 80,
+    reason: 'Natural and balanced color combination'
+  },
+  yellow: {
+    matching: ['white', 'gray', 'navy', 'blue', 'brown'],
+    confidence: 75,
+    reason: 'Bright and cheerful combination that creates visual interest'
+  },
+  purple: {
+    matching: ['white', 'gray', 'black', 'beige', 'navy'],
+    confidence: 80,
+    reason: 'Rich and elegant color pairing'
+  },
+  pink: {
+    matching: ['white', 'gray', 'navy', 'beige', 'brown'],
+    confidence: 85,
+    reason: 'Soft and feminine combination that creates a balanced look'
+  },
+  orange: {
+    matching: ['white', 'blue', 'brown', 'beige', 'navy'],
+    confidence: 75,
+    reason: 'Warm and energetic color pairing'
+  },
+  brown: {
+    matching: ['white', 'beige', 'blue', 'green', 'any'],
+    confidence: 85,
+    reason: 'Earthy tone that works well with both neutrals and colors'
+  },
+  gray: {
+    matching: ['any'],
+    confidence: 90,
+    reason: 'Neutral that enhances other colors while maintaining balance'
+  },
+  beige: {
+    matching: ['any'],
+    confidence: 90,
+    reason: 'Versatile neutral that creates a cohesive look'
+  }
+};
+
+// Category compatibility rules
+const CATEGORY_COMBINATIONS: Record<string, string[]> = {
+  'Tops': ['Pants', 'Skirts', 'Shorts'],
+  'T-shirts': ['Pants', 'Skirts', 'Shorts'],
+  'Shirts': ['Pants', 'Skirts', 'Shorts'],
+  'Sweaters': ['Pants', 'Skirts', 'Shorts'],
+  'Pants': ['Tops', 'T-shirts', 'Shirts', 'Sweaters'],
+  'Skirts': ['Tops', 'T-shirts', 'Shirts', 'Sweaters'],
+  'Shorts': ['Tops', 'T-shirts', 'Shirts', 'Sweaters'],
+  'Dresses': [],  // Dresses are standalone
+  'Jackets': ['any'],  // Jackets can go with anything
+  'Shoes': ['any']  // Shoes can go with anything
+};
+
 export const wardrobeService = {
   // Wardrobe Management
   getAllWardrobes: async () => {
@@ -224,4 +302,75 @@ export const wardrobeService = {
   incrementOutfitWear: async (wardrobeId: number, outfitId: number) => {
     return await apiClientWrapper.post<Outfit>(`/outfits/${outfitId}/wear`, {});
   },
+
+  getOutfitRecommendations: async (baseItem: ClothingItem) => {
+    try {
+      // Get all clothing items
+      const allItems = await wardrobeService.getAllClothingItems();
+      const recommendations = [];
+      
+      // Get base item's primary color
+      const baseColor = baseItem.colors[0].toLowerCase();
+      const colorMatch = COLOR_COMBINATIONS[baseColor as keyof typeof COLOR_COMBINATIONS] || {
+        matching: ['any'],
+        confidence: 70,
+        reason: 'Basic color coordination'
+      };
+
+      // Filter items by category compatibility and color matching
+      const compatibleCategories = CATEGORY_COMBINATIONS[baseItem.category] || [];
+      const matchingItems = allItems.filter(item => {
+        // Don't match with itself
+        if (item.id === baseItem.id) return false;
+
+        // Check category compatibility
+        if (compatibleCategories.length > 0 && !compatibleCategories.includes('any')) {
+          if (!compatibleCategories.includes(item.category)) return false;
+        }
+
+        // Check color compatibility
+        const itemColor = item.colors[0].toLowerCase();
+        return colorMatch.matching.includes('any') || colorMatch.matching.includes(itemColor);
+      });
+
+      // Sort by color match confidence and pick top 3
+      const sortedItems = matchingItems.sort((a, b) => {
+        const aColor = a.colors[0].toLowerCase();
+        const bColor = b.colors[0].toLowerCase();
+        const aConfidence = COLOR_COMBINATIONS[aColor as keyof typeof COLOR_COMBINATIONS]?.confidence || 70;
+        const bConfidence = COLOR_COMBINATIONS[bColor as keyof typeof COLOR_COMBINATIONS]?.confidence || 70;
+        return bConfidence - aConfidence;
+      });
+
+      // Create outfit recommendations (max 3)
+      for (let i = 0; i < Math.min(3, sortedItems.length); i++) {
+        const matchingItem = sortedItems[i];
+        const matchColor = matchingItem.colors[0].toLowerCase();
+        const confidence = Math.min(
+          colorMatch.confidence,
+          COLOR_COMBINATIONS[matchColor as keyof typeof COLOR_COMBINATIONS]?.confidence || 70
+        );
+
+        let reason = colorMatch.reason;
+        if (baseItem.category === 'Tops' && matchingItem.category === 'Pants') {
+          reason += ' Perfect for a casual or business look.';
+        } else if (baseItem.category === 'Dresses' && matchingItem.category === 'Shoes') {
+          reason += ' Great choice for completing the outfit.';
+        }
+
+        recommendations.push({
+          id: `recommendation-${i}`,
+          baseItem: baseItem,
+          matchingItem: matchingItem,
+          confidence,
+          reason
+        });
+      }
+
+      return recommendations;
+    } catch (error) {
+      console.error('Error generating outfit recommendations:', error);
+      throw error;
+    }
+  }
 };
