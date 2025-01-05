@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { ClothingItem } from '@/types/api.types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -123,29 +123,33 @@ export default function CreateOutfitScreen() {
     <View style={styles.container}>
       <Stack.Screen 
         options={{
-          title: 'Create Outfit',
-          headerRight: () => (
-            <TouchableOpacity 
-              style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
-              onPress={handleSave}
-              disabled={isSaving}
-            >
-              <Text style={[
-                styles.saveButtonText,
-                isSaving && styles.saveButtonTextDisabled
-              ]}>
-                {isSaving ? 'Saving...' : 'Save'}
-              </Text>
-            </TouchableOpacity>
-          ),
+          headerShown: false
         }}
       />
 
-      <View style={styles.grid}>
-        {Object.keys(SLOT_CONFIG).map((slot) => (
-          renderPlaceholder(slot as OutfitSlot)
-        ))}
-      </View>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Create Outfit</Text>
+          <TouchableOpacity 
+            style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+            onPress={handleSave}
+            disabled={isSaving}
+          >
+            <Text style={[
+              styles.saveButtonText,
+              isSaving && styles.saveButtonTextDisabled
+            ]}>
+              {isSaving ? 'Saving...' : 'Save'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.grid}>
+          {Object.keys(SLOT_CONFIG).map((slot) => (
+            renderPlaceholder(slot as OutfitSlot)
+          ))}
+        </View>
+      </ScrollView>
 
       {selectedSlot && (
         <ItemSelectionModal
@@ -164,6 +168,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  scrollView: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    paddingTop: 60,
+    paddingBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#11181C',
+  },
   grid: {
     padding: 16,
     flexDirection: 'row',
@@ -173,7 +193,7 @@ const styles = StyleSheet.create({
   placeholder: {
     width: '45%',
     aspectRatio: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F5F5F5',
     borderRadius: 12,
     padding: 16,
     justifyContent: 'center',
@@ -181,40 +201,43 @@ const styles = StyleSheet.create({
   },
   emptyItem: {
     alignItems: 'center',
+    gap: 8,
   },
   selectedItem: {
     alignItems: 'center',
+    gap: 8,
   },
   placeholderLabel: {
-    marginTop: 8,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
+    fontWeight: '500',
+    color: '#687076',
+    textAlign: 'center',
   },
   selectedLabel: {
-    marginTop: 8,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
+    fontWeight: '500',
+    color: '#11181C',
+    textAlign: 'center',
   },
   addText: {
-    marginTop: 4,
-    fontSize: 12,
-    color: '#999',
+    fontSize: 14,
+    color: '#687076',
   },
   saveButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    backgroundColor: '#0a7ea4',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
   },
   saveButtonDisabled: {
-    opacity: 0.5,
+    backgroundColor: '#E5E5E5',
   },
   saveButtonText: {
+    color: '#fff',
     fontSize: 16,
-    color: '#007AFF',
-    fontWeight: '600',
+    fontWeight: '500',
   },
   saveButtonTextDisabled: {
-    color: '#999',
+    color: '#687076',
   },
 }); 

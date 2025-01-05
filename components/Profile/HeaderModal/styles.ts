@@ -3,8 +3,12 @@ import { StyleSheet, Platform } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    flex: 0, 
-    paddingTop: 0, 
+    flex: 1,
+    paddingTop: 16,
+  },
+  weatherContainer: {
+    marginTop: 16,
+    marginBottom: 16,
   },
   // TopBar Styles
   topBar: {
@@ -12,7 +16,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 16,
+    paddingTop: 20,
   },
   logo: {
     fontSize: 26,
@@ -41,7 +46,7 @@ export const styles = StyleSheet.create({
 
   userSection: {
     paddingHorizontal: 16,
-    marginTop: 20,
+    marginTop: 12,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -69,7 +74,7 @@ export const styles = StyleSheet.create({
   },
   // Weather Section
   weatherSection: {
-    marginTop: 16,
+    marginTop: 12,
   },
   weatherScrollContainer: {
     paddingHorizontal: 16,
@@ -157,7 +162,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   location: {
     flexDirection: 'row',

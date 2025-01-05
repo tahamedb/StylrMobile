@@ -168,11 +168,38 @@ export default function OutfitsScreen() {
     }
   };
 
-  const handleOutfitPress = (outfit: Outfit) => {
-    router.push({
-      pathname: '/outfit-detail',
-      params: { id: outfit.id }
-    });
+  const handleOutfitPress = (outfit: Outfit | RecommendedOutfit) => {
+    // For recommended outfits, we need to format the data to match the expected structure
+    if ('items' in outfit) {
+      const formattedOutfit = {
+        ...outfit,
+        // Convert items array to the expected structure
+        top: outfit.items?.find(item => item.category === 'top'),
+        bottom: outfit.items?.find(item => item.category === 'bottom'),
+        shoes: outfit.items?.find(item => item.category === 'shoes'),
+        dress: outfit.items?.find(item => item.category === 'dress'),
+        outerwear: outfit.items?.find(item => item.category === 'outerwear'),
+      };
+      
+      router.push({
+        pathname: '/outfit-detail',
+        params: { 
+          id: outfit.id,
+          isRecommended: '1',
+          outfitData: JSON.stringify(formattedOutfit),
+          fromTab: activeTab
+        }
+      });
+    } else {
+      // Regular outfit navigation
+      router.push({
+        pathname: '/outfit-detail',
+        params: { 
+          id: outfit.id,
+          fromTab: activeTab
+        }
+      });
+    }
   };
 
   const filteredOutfits = outfitsData.filter(outfit => {
@@ -556,7 +583,7 @@ export default function OutfitsScreen() {
             value={outfitName}
             onChangeText={setOutfitName}
             placeholder="Name your outfit"
-            placeholderTextColor="rgba(255, 255, 255, 0.5)"
+            placeholderTextColor="rgba(0, 0, 0, 0.5)"
           />
 
           <TextInput
@@ -564,7 +591,7 @@ export default function OutfitsScreen() {
             value={description}
             onChangeText={setDescription}
             placeholder="Add a description"
-            placeholderTextColor="rgba(255, 255, 255, 0.5)"
+            placeholderTextColor="rgba(0, 0, 0, 0.5)"
             multiline
             numberOfLines={3}
           />
@@ -1186,11 +1213,18 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: '90%',
-    backgroundColor: 'transparent',
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
   },
   createContent: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     overflow: 'hidden',
@@ -1200,14 +1234,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
+    paddingTop: 20,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
-    backgroundColor: '#111',
+    borderBottomColor: '#F1F3F5',
+    backgroundColor: '#fff',
   },
   headerButton: {
     padding: 8,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   headerButtonDisabled: {
     opacity: 0.5,
@@ -1215,10 +1248,10 @@ const styles = StyleSheet.create({
   createTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#fff',
+    color: '#11181C',
   },
   saveText: {
-    color: '#fff',
+    color: '#0a7ea4',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1228,12 +1261,13 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F5F5F5',
     borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 16,
     marginBottom: 12,
-    color: '#fff',
+    color: '#11181C',
+    placeholderTextColor: '#687076',
   },
   textArea: {
     height: 100,
@@ -1249,7 +1283,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#fff',
+    color: '#11181C',
     marginBottom: 12,
   },
   placeholder: {
@@ -1288,7 +1322,7 @@ const styles = StyleSheet.create({
   placeholderLabel: {
     marginTop: 8,
     fontSize: 14,
-    color: '#fff',
+    color: '#11181C',
   },
   selectorContainer: {
     marginBottom: 24,
@@ -1429,19 +1463,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F5F5F5',
     marginRight: 8,
   },
   chipSelected: {
-    backgroundColor: '#fff',
+    backgroundColor: '#0a7ea4',
   },
   chipText: {
-    color: '#fff',
+    color: '#11181C',
     fontSize: 14,
   },
   chipTextSelected: {
-    color: '#000',
-    fontWeight: '600',
+    color: '#fff',
   },
   tabsContainer: {
     flexDirection: 'row',

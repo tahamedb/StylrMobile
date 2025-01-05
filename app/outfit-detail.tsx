@@ -1,137 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Alert,
-  ActivityIndicator,
-  Platform,
-} from 'react-native';
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { BlurView } from 'expo-blur';
+import { useLocalSearchParams } from 'expo-router';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useOutfits } from '@/hooks/profile/BodyModal/useOutfits';
-import { wardrobeService } from '@/services/wardrobe/wardrobeService';
-import { Outfit, ClothingItem } from '@/types/api.types';
+import { useOutfitDetails } from '../hooks/profile/BodyModal/useOutfitDetails';
 
 export default function OutfitDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
-  const { deleteOutfit } = useOutfits();
-  const [outfit, setOutfit] = useState<Outfit | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { id, isRecommended, outfitData, fromTab } = useLocalSearchParams<{ 
+    id: string; 
+    isRecommended: string; 
+    outfitData: string;
+    fromTab: string;
+  }>();
+  
+  // Only try to parse outfit data if we're coming from the recommended tab
+  const isFromRecommendedTab = fromTab === 'Recommended';
+  const recommendedOutfit = isFromRecommendedTab && outfitData ? JSON.parse(outfitData) : null;
+  
+  // Only use the hook if we're not coming from the recommended tab
+  const { outfit, isLoading, error, deleteOutfit } = !isFromRecommendedTab
+    ? useOutfitDetails(Number(id))
+    : { outfit: null, isLoading: false, error: null, deleteOutfit: null };
 
-  useEffect(() => {
-    loadOutfit();
-  }, [id]);
+  // Use recommended outfit data if we're coming from the recommended tab
+  const displayOutfit = isFromRecommendedTab ? recommendedOutfit : outfit;
 
-  const loadOutfit = async () => {
-    if (!id) return;
-
-    try {
-      setIsLoading(true);
-      setError(null);
-      const outfit = await wardrobeService.getOutfitById(parseInt(id, 10));
-      if (!outfit) {
-        throw new Error('Outfit not found');
-      }
-      setOutfit(outfit);
-    } catch (err) {
-      console.error('Error loading outfit:', err);
-      setError('Failed to load outfit details');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleEdit = () => {
-    if (!outfit) return;
-    router.push({
-      pathname: '/edit-outfit',
-      params: { id: outfit.id }
-    });
-  };
-
-  const handleDelete = () => {
-    if (!outfit || isDeleting) return;
-
-    Alert.alert(
-      'Delete Outfit',
-      'Are you sure you want to delete this outfit?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setIsDeleting(true);
-              await deleteOutfit(outfit.id);
-              router.back();
-            } catch (err) {
-              console.error('Error deleting outfit:', err);
-              Alert.alert('Error', 'Failed to delete outfit');
-            } finally {
-              setIsDeleting(false);
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const renderClothingItem = (item: ClothingItem | { id: number } | undefined) => {
-    if (!item) return null;
-
-    const clothingItem = item as ClothingItem;
-    if (!clothingItem.name) return null;
-
-    return (
-      <View style={styles.itemCard}>
-        {clothingItem.imageUrl ? (
-          <Image
-            source={{ uri: clothingItem.imageUrl }}
-            style={styles.itemImage}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={styles.itemPlaceholder}>
-            <Ionicons name="shirt-outline" size={24} color="#687076" />
-          </View>
-        )}
-        <View style={styles.itemInfo}>
-          <Text style={styles.itemName}>{clothingItem.name}</Text>
-          <Text style={styles.itemCategory}>{clothingItem.category}</Text>
-        </View>
-      </View>
-    );
-  };
-
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Stack.Screen 
-          options={{
-            headerShown: false
-          }}
-        />
-        <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color="#ff3b30" />
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadOutfit}>
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  if (isLoading) {
+  if (isLoading && !isFromRecommendedTab) {
     return (
       <View style={styles.container}>
         <Stack.Screen 
@@ -147,6 +40,22 @@ export default function OutfitDetailScreen() {
     );
   }
 
+  if (error && !isFromRecommendedTab) {
+    return (
+      <View style={styles.container}>
+        <Stack.Screen 
+          options={{
+            headerShown: false
+          }}
+        />
+        <View style={styles.errorContainer}>
+          <Ionicons name="alert-circle-outline" size={48} color="#ff3b30" />
+          <Text style={styles.errorText}>Failed to load outfit details</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Stack.Screen 
@@ -154,70 +63,155 @@ export default function OutfitDetailScreen() {
           headerShown: false
         }}
       />
-      
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+
+      <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <Ionicons name="chevron-back" size={24} color="#11181C" />
-          </TouchableOpacity>
-          <View style={styles.headerActions}>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={handleEdit}
-            >
-              <Ionicons name="pencil" size={20} color="#11181C" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.deleteButton]}
-              onPress={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <ActivityIndicator size="small" color="#ff3b30" />
-              ) : (
-                <Ionicons name="trash-outline" size={20} color="#ff3b30" />
+          <Text style={styles.title}>{displayOutfit?.name}</Text>
+          <Text style={styles.description}>{displayOutfit?.description}</Text>
+          
+          <View style={styles.detailsRow}>
+            <View style={styles.detailItem}>
+              <Text style={styles.detailLabel}>Season</Text>
+              <Text style={styles.detailValue}>{displayOutfit?.season}</Text>
+            </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.detailLabel}>Occasion</Text>
+              <Text style={styles.detailValue}>{displayOutfit?.occasion}</Text>
+            </View>
+            {displayOutfit?.rating && (
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>Rating</Text>
+                <Text style={styles.detailValue}>{displayOutfit.rating.toFixed(1)} ★</Text>
+              </View>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            {isRecommended === '1' ? 'Recommended Items' : 'Items in this Outfit'}
+          </Text>
+          {isRecommended === '1' ? (
+            // Render recommended items list
+            <View style={styles.recommendedItems}>
+              {recommendedOutfit?.items?.map((item: any) => (
+                <View key={item.id} style={styles.recommendedItem}>
+                  <View style={styles.itemIconContainer}>
+                    <Ionicons 
+                      name={
+                        item.category === 'top' ? 'shirt-outline' :
+                        item.category === 'bottom' ? 'layers-outline' :
+                        item.category === 'shoes' ? 'footsteps-outline' :
+                        item.category === 'dress' ? 'woman-outline' :
+                        'shirt-outline'
+                      } 
+                      size={24} 
+                      color="#0a7ea4" 
+                    />
+                  </View>
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName}>{item.name}</Text>
+                    <Text style={styles.itemCategory}>
+                      {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          ) : (
+            // Render actual outfit items
+            <View style={styles.items}>
+              {displayOutfit?.top && (
+                <View style={styles.item}>
+                  <View style={styles.itemImageContainer}>
+                    {displayOutfit.top.imageUrl ? (
+                      <Image source={{ uri: displayOutfit.top.imageUrl }} style={styles.itemImage} />
+                    ) : (
+                      <View style={styles.itemPlaceholder}>
+                        <Ionicons name="shirt-outline" size={24} color="#0a7ea4" />
+                      </View>
+                    )}
+                  </View>
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName}>{displayOutfit.top.name}</Text>
+                    <Text style={styles.itemCategory}>Top</Text>
+                    <Text style={styles.itemWears}>Worn {displayOutfit.top.wearCount || 0} times</Text>
+                  </View>
+                </View>
               )}
+              {displayOutfit?.bottom && (
+                <View style={styles.item}>
+                  <View style={styles.itemImageContainer}>
+                    {displayOutfit.bottom.imageUrl ? (
+                      <Image source={{ uri: displayOutfit.bottom.imageUrl }} style={styles.itemImage} />
+                    ) : (
+                      <View style={styles.itemPlaceholder}>
+                        <Ionicons name="layers-outline" size={24} color="#0a7ea4" />
+                      </View>
+                    )}
+                  </View>
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName}>{displayOutfit.bottom.name}</Text>
+                    <Text style={styles.itemCategory}>Bottom</Text>
+                    <Text style={styles.itemWears}>Worn {displayOutfit.bottom.wearCount || 0} times</Text>
+                  </View>
+                </View>
+              )}
+              {displayOutfit?.shoes && (
+                <View style={styles.item}>
+                  <View style={styles.itemImageContainer}>
+                    {displayOutfit.shoes.imageUrl ? (
+                      <Image source={{ uri: displayOutfit.shoes.imageUrl }} style={styles.itemImage} />
+                    ) : (
+                      <View style={styles.itemPlaceholder}>
+                        <Ionicons name="footsteps-outline" size={24} color="#0a7ea4" />
+                      </View>
+                    )}
+                  </View>
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName}>{displayOutfit.shoes.name}</Text>
+                    <Text style={styles.itemCategory}>Shoes</Text>
+                    <Text style={styles.itemWears}>Worn {displayOutfit.shoes.wearCount || 0} times</Text>
+                  </View>
+                </View>
+              )}
+              {displayOutfit?.dress && (
+                <View style={styles.item}>
+                  <View style={styles.itemImageContainer}>
+                    {displayOutfit.dress.imageUrl ? (
+                      <Image source={{ uri: displayOutfit.dress.imageUrl }} style={styles.itemImage} />
+                    ) : (
+                      <View style={styles.itemPlaceholder}>
+                        <Ionicons name="woman-outline" size={24} color="#0a7ea4" />
+                      </View>
+                    )}
+                  </View>
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName}>{displayOutfit.dress.name}</Text>
+                    <Text style={styles.itemCategory}>Dress</Text>
+                    <Text style={styles.itemWears}>Worn {displayOutfit.dress.wearCount || 0} times</Text>
+                  </View>
+                </View>
+              )}
+            </View>
+          )}
+        </View>
+
+        {!isRecommended && (
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => {
+                if (deleteOutfit) {
+                  deleteOutfit();
+                }
+              }}
+            >
+              <Ionicons name="trash-outline" size={24} color="#ff3b30" />
+              <Text style={styles.deleteButtonText}>Delete Outfit</Text>
             </TouchableOpacity>
           </View>
-        </View>
-
-        <View style={styles.outfitInfo}>
-          <Text style={styles.outfitName}>{outfit?.name}</Text>
-          {outfit?.description && (
-            <Text style={styles.outfitDescription}>{outfit.description}</Text>
-          )}
-          <View style={styles.tags}>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>{outfit?.season}</Text>
-            </View>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>{outfit?.occasion}</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.itemsContainer}>
-          {renderClothingItem(outfit?.top)}
-          {renderClothingItem(outfit?.bottom)}
-          {renderClothingItem(outfit?.dress)}
-          {renderClothingItem(outfit?.outerwear)}
-          {renderClothingItem(outfit?.shoes)}
-        </View>
-
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{outfit?.rating?.toFixed(1) || '0.0'}</Text>
-            <Text style={styles.statLabel}>Rating</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{outfit?.timesWorn || 0}</Text>
-            <Text style={styles.statLabel}>Times Worn</Text>
-          </View>
-        </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -231,87 +225,80 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  scrollContent: {
-    padding: 16,
-  },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: Platform.OS === 'ios' ? 40 : 20,
-    marginBottom: 16,
+    padding: 16,
+    paddingTop: 60,
   },
-  backButton: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: '#F1F3F5',
-  },
-  headerActions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  actionButton: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: '#F1F3F5',
-  },
-  deleteButton: {
-    backgroundColor: '#FFE5E5',
-  },
-  outfitInfo: {
-    marginBottom: 24,
-  },
-  outfitName: {
+  title: {
     fontSize: 24,
     fontWeight: '600',
     color: '#11181C',
     marginBottom: 8,
   },
-  outfitDescription: {
+  description: {
     fontSize: 16,
     color: '#687076',
     marginBottom: 16,
   },
-  tags: {
+  detailsRow: {
     flexDirection: 'row',
-    gap: 8,
-  },
-  tag: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: '#F1F3F5',
-    borderRadius: 16,
-  },
-  tagText: {
-    fontSize: 14,
-    color: '#687076',
-  },
-  itemsContainer: {
-    gap: 16,
+    justifyContent: 'space-between',
     marginBottom: 24,
   },
-  itemCard: {
+  detailItem: {
+    alignItems: 'center',
+  },
+  detailLabel: {
+    fontSize: 14,
+    color: '#687076',
+    marginBottom: 4,
+  },
+  detailValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#11181C',
+  },
+  section: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F3F5',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#11181C',
+    marginBottom: 16,
+  },
+  items: {
+    gap: 12,
+  },
+  item: {
     flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#F1F3F5',
     borderRadius: 12,
+    padding: 16,
+  },
+  itemImageContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
     overflow: 'hidden',
-    height: 100,
+    marginRight: 12,
   },
   itemImage: {
-    width: 100,
+    width: '100%',
     height: '100%',
   },
   itemPlaceholder: {
-    width: 100,
+    width: '100%',
     height: '100%',
+    backgroundColor: '#E5E5E5',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F1F3F5',
   },
-  itemInfo: {
+  itemDetails: {
     flex: 1,
-    padding: 12,
-    justifyContent: 'center',
   },
   itemName: {
     fontSize: 16,
@@ -322,32 +309,59 @@ const styles = StyleSheet.create({
   itemCategory: {
     fontSize: 14,
     color: '#687076',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#F1F3F5',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#11181C',
     marginBottom: 4,
   },
-  statLabel: {
+  itemWears: {
     fontSize: 14,
     color: '#687076',
   },
-  statDivider: {
-    width: 1,
-    backgroundColor: '#E6E8EB',
-    marginHorizontal: 16,
+  recommendedItems: {
+    gap: 12,
+  },
+  recommendedItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#F1F3F5',
+    borderRadius: 12,
+  },
+  itemIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#E6F4F9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  actions: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F3F5',
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    backgroundColor: '#FFF1F0',
+    borderRadius: 12,
+  },
+  deleteButtonText: {
+    marginLeft: 8,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ff3b30',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#11181C',
   },
   errorContainer: {
     flex: 1,
@@ -360,28 +374,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#11181C',
     textAlign: 'center',
-  },
-  retryButton: {
-    marginTop: 16,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    backgroundColor: '#0a7ea4',
-    borderRadius: 25,
-  },
-  retryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#11181C',
-    fontWeight: '500',
   },
 }); 

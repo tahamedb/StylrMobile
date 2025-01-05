@@ -38,13 +38,15 @@ export const HeaderModal: React.FC<HeaderModalProps> = ({
 
     {/* Weather section for private profile */}
     {isPrivate && weather && (
+      <View style={styles.weatherContainer}>
         <WeatherSection 
           weather={weather}
           location={location}
           variant={variant}
           onCalendarPress={onCalendarPress}
         />
-      )}
+      </View>
+    )}
 
       {/* Public Profile Content */}
       {!isPrivate && (
