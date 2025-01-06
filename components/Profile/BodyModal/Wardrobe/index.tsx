@@ -12,7 +12,7 @@ import { useWardrobe as useWardrobeContext } from '@/contexts/WardrobeContext';
 
 export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
   const router = useRouter();
-  const user = { username: 'test' , id: 1};
+  const { user } = useProfile(1); // Get the real connected user
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [allClothingItems, setAllClothingItems] = useState<ClothingItem[]>([]);
@@ -25,6 +25,25 @@ export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
     refetch 
   } = useWardrobe();
   const { refreshWardrobes } = useWardrobeContext();
+  
+  // Fake wardrobe visibility state
+  const [wardrobeVisibility, setWardrobeVisibility] = useState<Record<number, boolean>>({});
+
+  // Initialize visibility state when wardrobes change
+  useEffect(() => {
+    const initialVisibility: Record<number, boolean> = {};
+    wardrobes.forEach(wardrobe => {
+      initialVisibility[wardrobe.id] = true; // Default all wardrobes to public for demo
+    });
+    setWardrobeVisibility(initialVisibility);
+  }, [wardrobes]);
+
+  const toggleWardrobeVisibility = (wardrobeId: number) => {
+    setWardrobeVisibility(prev => ({
+      ...prev,
+      [wardrobeId]: !prev[wardrobeId]
+    }));
+  };
 
   // Load all clothing items on mount
   useEffect(() => {
@@ -64,8 +83,9 @@ export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
     });
   }, [wardrobes]);
 
+  // Filter wardrobes based on visibility in public view
   const filteredWardrobes = variant === 'public'
-    ? sortedWardrobes.filter(wardrobe => wardrobe.user?.id === user?.id)
+    ? sortedWardrobes.filter(wardrobe => wardrobeVisibility[wardrobe.id])
     : sortedWardrobes;
 
   if (variant === 'public' && filteredWardrobes.length === 0) {
@@ -177,6 +197,26 @@ export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
     );
   };
 
+  const renderVisibilityToggle = (wardrobe: WardrobeType) => {
+    if (variant !== 'private') return null;
+    
+    return (
+      <TouchableOpacity 
+        onPress={(e) => {
+          e.stopPropagation();
+          toggleWardrobeVisibility(wardrobe.id);
+        }}
+        style={styles.actionButton}
+      >
+        {wardrobeVisibility[wardrobe.id] ? (
+          <Eye size={16} color="#0a7ea4" />
+        ) : (
+          <Lock size={16} color="#666" />
+        )}
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <ScrollView 
       style={styles.container} 
@@ -228,21 +268,24 @@ export const Wardrobe = ({ variant }: { variant: 'private' | 'public' }) => {
               </View>
               <View style={styles.countContainer}>
                 {variant === 'private' && (
-                  <TouchableOpacity 
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      handleDeleteWardrobe(wardrobe);
-                    }}
-                    style={styles.actionButton}
-                  >
-                    <Trash2 size={16} color="#666" />
-                  </TouchableOpacity>
+                  <>
+                    {renderVisibilityToggle(wardrobe)}
+                    <TouchableOpacity 
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        handleDeleteWardrobe(wardrobe);
+                      }}
+                      style={styles.actionButton}
+                    >
+                      <Trash2 size={16} color="#666" />
+                    </TouchableOpacity>
+                  </>
                 )}
                 <View style={styles.actionButton}>
                   {variant === 'private' ? (
                     <Lock size={16} color="#666" />
                   ) : (
-                    <Eye size={16} color="#666" />
+                    <Eye size={16} color="#0a7ea4" />
                   )}
                   <Text style={styles.countText}>
                     {wardrobe.clothingItems?.length || 0}

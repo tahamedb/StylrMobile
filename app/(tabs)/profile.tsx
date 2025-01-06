@@ -23,7 +23,12 @@ export default function ProfileScreen() {
       setLoading(true);
       setError(null);
       const userData = await userService.getCurrentUser();
-      setUser(userData);
+      // Add fake followers/following to the real user
+      setUser({
+        ...userData,
+        followers: Array(16).fill(null),
+        followings: Array(10).fill(null)
+      });
     } catch (err) {
       console.error('Failed to load profile:', err);
       setError('Failed to load profile data');
