@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 
 const AI_API_URL = Platform.select({
     ios: 'http://localhost:8000',
-    android: 'http://192.168.100.1238000',
+    android: 'http://192.168.1.106:8000',
 });
 
 const aiClient = axios.create({

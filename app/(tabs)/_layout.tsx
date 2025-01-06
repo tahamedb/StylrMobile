@@ -51,19 +51,7 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
-        name="createPost"
-        options={{
-          title: 'Post',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons 
-              name="grid" 
-              size={24} 
-              color={color} 
-            />
-          ),
-        }}
-      />
+
 
       <Tabs.Screen
         name="wardrobe"
@@ -106,19 +94,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons 
-              name="cog-outline" 
-              size={26} 
-              color={color} 
-            />
-          ),
-        }}
-      />
+  
 
       <Tabs.Screen
         name="outfits"
@@ -130,6 +106,22 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons
+              name="cog-outline"
+              size={26}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Tabs>
+
+    
   );
 }

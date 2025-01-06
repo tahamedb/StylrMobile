@@ -10,7 +10,8 @@ import {
   TextInput,
   TouchableOpacity,
   Share,
-  Platform
+  Platform,
+  Pressable
 } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { SearchBarWithList } from '@/components/SearchBarWithList';
@@ -18,6 +19,8 @@ import { Post } from '@/components/Post';
 import { usePosts } from '@/hooks/usePosts';
 import { Post as PostType } from '@/types/api.types';
 import { getRelativeTime } from '@/utils/dateUtils';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 const BASE_URL = Platform.select({
   ios: 'http://localhost:8088',
@@ -31,6 +34,10 @@ export default function HomeScreen() {
   const [commentModalVisible, setCommentModalVisible] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+
+  const handleCreatePost = () => {
+    router.push('/createPost');
+  };
 
   const handleComment = (postId: number) => {
     setSelectedPostId(postId);
@@ -151,6 +158,13 @@ export default function HomeScreen() {
           }
         />
 
+        <Pressable 
+          style={styles.fab}
+          onPress={handleCreatePost}
+        >
+          <MaterialCommunityIcons name="plus" size={24} color="#fff" />
+        </Pressable>
+
         <Modal
           visible={commentModalVisible}
           animationType="slide"
@@ -260,5 +274,24 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  fab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    backgroundColor: '#0a7ea4',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });

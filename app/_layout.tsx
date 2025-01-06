@@ -34,17 +34,24 @@ function RootLayoutNav() {
       />
       <Stack.Screen 
         name="clothingDetail"
-        options={{ 
+        options={{
           headerShown: false,
           presentation: 'modal'
-        }} 
+        }}
+      />
+      <Stack.Screen 
+        name="createPost"
+        options={{
+          headerShown: false,
+          presentation: 'modal'
+        }}
       />
       <Stack.Screen 
         name="auth" 
-        options={{ 
+        options={{
           headerShown: false,
           presentation: 'modal'
-        }} 
+        }}
       />
     </Stack>
   );
